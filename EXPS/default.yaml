@@ -1,0 +1,36 @@
+####################################
+
+## Data Generation
+data_dim: 100     # d
+probability: 0.5  # p
+nullity: 0 
+seed_data: 42
+
+mu_scale: 1.
+eps: 0.01
+max_cov_eigs: [2., 1.]
+
+####################################
+
+## PCA
+## subspace_optimization: training R. if offline, it doesn't train Lam.
+## pca_optimization: training Lam. if offline, it doesn't train R.
+
+target_dim: 3   # k
+rank: 10        # r
+n_iter: 100
+batch_size: 100
+constraint: all
+center_by_mean:
+subspace_optimization: npmfd
+pca_optimization: oja
+lr_subspace:
+lr_pca: 0.01
+landing_lambda: 
+n_iter_history: 
+
+seed_train:
+tolerance: 0
+# subspace_only: False
+
+############ END OF FILE ############
