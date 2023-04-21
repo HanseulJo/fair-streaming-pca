@@ -364,10 +364,10 @@ class StreamingFairBlockPCA:
             if mode == 'oja':   V += lr * G
             elif mode == 'pm':  V = G
             elif mode == 'riemannian': 
-                riemannian_grad = .5 * (G - V @ (G.T @ V))
+                riemannian_grad = (G - V @ (G.T @ V))
                 V += lr * riemannian_grad
             elif mode == 'landing':
-                riemannian_grad = .5 * (G - V @ (G.T @ V))
+                riemannian_grad = (G - V @ (G.T @ V))
                 field = V @ (V.T @ V) - V
                 V += lr * (riemannian_grad + landing_lambda * field)
             if mode != 'landing':
@@ -581,12 +581,12 @@ class StreamingFairBlockPCA:
                         R, _ = np.linalg.qr(R)
                     elif subspace_optimization == 'riemannian':
                         covdiff_covdiff_R = Q_hat_squared_R(X1,X2,R)
-                        riemannian_grad = .5 * (covdiff_covdiff_R - R @ (covdiff_covdiff_R.T @ R))
+                        riemannian_grad = (covdiff_covdiff_R - R @ (covdiff_covdiff_R.T @ R))
                         R += lr_subspace * riemannian_grad
                         R, _ = np.linalg.qr(R)
                     elif subspace_optimization == 'landing':
                         covdiff_covdiff_R = Q_hat_squared_R(X1,X2,R)
-                        riemannian_grad = .5 * (covdiff_covdiff_R - R @ (covdiff_covdiff_R.T @ R))
+                        riemannian_grad = (covdiff_covdiff_R - R @ (covdiff_covdiff_R.T @ R))
                         field = R @ (R.T @ R) - R
                         R += lr_subspace * (riemannian_grad + landing_lambda * field)
                     elif subspace_optimization == 'history':
@@ -628,12 +628,12 @@ class StreamingFairBlockPCA:
                 V, _ = np.linalg.qr(V)
             elif pca_optimization == 'riemannian':
                 G = gradient(X1,X2,V)
-                riemannian_grad = .5 * (G - V @ (G.T @ V))
+                riemannian_grad = (G - V @ (G.T @ V))
                 V += lr_pca * riemannian_grad
                 V, _ = np.linalg.qr(V)
             elif pca_optimization == 'landing': 
                 G = gradient(X1,X2,V)
-                riemannian_grad = .5 * (G - V @ (G.T @ V))
+                riemannian_grad = (G - V @ (G.T @ V))
                 field = V @ (V.T @ V) - V
                 V += lr_pca * (riemannian_grad + landing_lambda * field)
             elif pca_optimization == 'history':

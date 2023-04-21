@@ -19,15 +19,14 @@ max_cov_eigs: [2., 1.]
 target_dim: 3   # k
 rank: 10        # r
 n_iter: 100
-batch_size: 100
+batch_size: 1000
 constraint: all
 center_by_mean:
-subspace_optimization: npmfd
-pca_optimization: oja
-lr_subspace:
-lr_pca: 0.01
+subspace_optimization: npm
+pca_optimization: npm
+lr_pca: 
 landing_lambda: 
-n_iter_history: 
+n_iter_inner: 
 
 seed_train:
 tolerance: 0

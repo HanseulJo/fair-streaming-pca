@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 import yaml
-from fairPCA_jaxnumpy_Q1Q2 import run
+from fairPCA import run
 import os.path as osp
 from pprint import pprint
 
