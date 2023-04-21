@@ -452,8 +452,8 @@ class StreamingFairBlockPCA:
         
         ## After Sampling
         for s in range(self.num_groups):
-            if constraint in ['covariance', 'all']:
-                cov_R_group[s] -= np.outer(mean_global_group[s], np.dot(mean_global_group[s], R))
+            # if constraint in ['covariance', 'all']:
+            #     cov_R_group[s] -= np.outer(mean_global_group[s], np.dot(mean_global_group[s], R))
             if constraint in ['mean', 'all']:
                 mean_global_group[s] *= n_global_group[s]
                 mean_global_group[s] += n_local_group[s] * mean_local_group[s]
@@ -616,7 +616,7 @@ class StreamingFairBlockPCA:
                 n_local += 1
 
             ## After Sampling
-            cov_V -= np.outer(mean_global, np.dot(mean_global, V))
+            # cov_V -= np.outer(mean_global, np.dot(mean_global, V))
             mean_global *= n_global
             mean_global += batch_size_pca * mean_local
             mean_global /= n_global + batch_size_pca
