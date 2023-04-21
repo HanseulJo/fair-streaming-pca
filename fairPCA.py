@@ -293,15 +293,17 @@ class StreamingFairBlockPCA:
         if f is not None:
             self.buffer.mu_gap_estim_err.append(sin(f, self.mu_gap))
 
+
     def offline_train(self,
             target_dim,
             rank,
             n_iter,
             lr,
             seed=None,
-            tol=None,
-            mode='oja',         # ['oja', 'pm']
             constraint='all',   # ['vanilla', 'mean', 'covariance', 'all']
+            subspace_optimization='pm',    
+            pca_optimization='pm',
+            n_iter_inner=None,
             lr_scheduler=None,
             landing_lambda = .1,
             fairness_tradeoff=1.,
@@ -313,7 +315,10 @@ class StreamingFairBlockPCA:
         assert isinstance(target_dim, int) and target_dim < self.d
         assert isinstance(n_iter, int) and n_iter > 0
         assert isinstance(lr, (int, float)) and lr > 0
-        assert mode in ['oja', 'pm', 'riemannian', 'landing']
+        if constraint != 'vanilla':
+            assert subspace_optimization in ['pm']
+            assert isinstance(n_iter_inner, int) and n_iter_inner > 0
+        assert pca_optimization in ['oja', 'pm', 'riemannian', 'landing']
         assert constraint in ['vanilla', 'mean', 'covariance', 'all']
 
         # rng = np.random.default_rng(seed)
@@ -334,23 +339,33 @@ class StreamingFairBlockPCA:
         if constraint in ['mean', 'covariance', 'all']:
             self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(self.k, rank, mode=constraint)
 
+        R = None
         if constraint in ['mean', 'all']:
             ## Mean gap
             f = self.mu_gap / np.linalg.norm(self.mu_gap)
             N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
         if constraint in ['covariance','all']:
             ## Covariance gap
-            R_ = self.eigvec_Sigma_gap_sq[:,-rank:]
-            N = R_   # this line is used only when `constrain == 'covariance'`
-        if constraint == 'all':
-            ## Normal subspace; for both mean & covariance gap
-            N = np.concatenate([f.reshape(-1,1), R_], 1)
-            N, _ = np.linalg.qr(N)
+            key, rng = random.split(key)
+            R, _ = np.linalg.qr(random.normal(rng, (self.d, self.r)))
+            N = R.copy()   # this line is used only when `constrain == 'covariance'`
+
         # V, _ = np.linalg.qr(rng.standard_normal((self.d, self.k)))
         key, rng = random.split(key)
         V, _ = np.linalg.qr(random.normal(rng, (self.d, self.k)))
+        self.evaluate(V=V, R=R)
+
+        if constraint in ['mena', 'covariance', 'all']:
+            for _ in trange(1, n_iter_inner+1):
+                G = self.Sigma_gap @ R
+                if subspace_optimization == 'pm': R = G
+                R, _ = np.linalg.qr(R)
+                self.evaluate(R=R)
         
-        self.evaluate(V=V)
+        if constraint == 'all':
+            ## Normal subspace; for both mean & covariance gap
+            N = np.concatenate([f.reshape(-1,1), R], 1)
+            N, _ = np.linalg.qr(N)
         
         lr0 = lr
         pbar = trange(1, n_iter+1)
@@ -364,24 +379,19 @@ class StreamingFairBlockPCA:
                 G = self.Sigma @ (V - fairness_tradeoff * N @ N.T @ V)
                 G -= fairness_tradeoff * N @ N.T @ G
             ## Update
-            if mode == 'oja':   V += lr * G
-            elif mode == 'pm':  V = G
-            elif mode == 'riemannian': 
+            if pca_optimization == 'oja':   V += lr * G
+            elif pca_optimization == 'pm':  V = G
+            elif pca_optimization == 'riemannian': 
                 riemannian_grad = (G - V @ (G.T @ V))
                 V += lr * riemannian_grad
-            elif mode == 'landing':
+            elif pca_optimization == 'landing':
                 riemannian_grad = (G - V @ (G.T @ V))
                 field = V @ (V.T @ V) - V
                 V += lr * (riemannian_grad + landing_lambda * field)
-            if mode != 'landing':
+            if pca_optimization != 'landing':
                 V, _ = np.linalg.qr(V)
             
             self.evaluate(V=V)
-            if tol is not None:
-                _gr = grassmanian_distance(_V, V)  # compare Lam
-                pbar.set_description(f"gap={_gr:.6f}")
-                if _gr < tol:
-                    print(f"OUTER: Broke in {t} / {n_iter}"); break
         return V
     
 
@@ -438,6 +448,7 @@ class StreamingFairBlockPCA:
             cov_R_group = [np.zeros((self.d, rank)) for _ in range(self.num_groups)]
 
         ## Sampling
+        # while min(n_local_group)<batch_size and not (sum(n_local_group)>=2*batch_size and min(n_local_group)>0):
         while min(n_local_group)<batch_size:
             s, x = self.sample()
             if constraint in ['mean', 'all']:
@@ -500,6 +511,185 @@ class StreamingFairBlockPCA:
 
 
     def train(self,
+            target_dim,
+            rank,
+            n_iter,
+            batch_size_subspace,
+            batch_size_pca,
+            constraint='all',
+            subspace_optimization='npm',
+            pca_optimization='oja',
+            n_iter_inner=None,
+            lr_pca=None,
+            landing_lambda=None,
+            seed=None,
+            verbose=True,
+            lr_scheduler=None,
+            fairness_tradeoff=1.,
+        ):
+        """
+        Streaminig Fair Block PCA Algorithm.
+
+        """
+        ## Check arguments
+        assert isinstance(target_dim, int) and 0 < target_dim < self.d
+        assert isinstance(rank, int) and 0 < rank <= self.d
+        assert isinstance(n_iter, int) and n_iter > 0
+        assert constraint in ['vanilla', 'mean', 'covariance', 'all'], constraint
+        subspace_frequent_direction = False
+        if constraint != 'vanilla':
+            assert subspace_optimization in ['npm', 'npmfd', 'history', 'historyfd'], subspace_optimization
+            assert isinstance(batch_size_subspace, int) and batch_size_subspace > 0
+            if subspace_optimization[-2:] == 'fd':
+                subspace_optimization = subspace_optimization[:-2]
+                subspace_frequent_direction = True
+        pca_frequent_direction = False
+        assert pca_optimization in ['oja', 'npm', 'ojafd', 'npmfd', 'riemannian', 'landing', 'history', 'historyfd'], pca_optimization
+        assert isinstance(batch_size_pca, int) and batch_size_pca > 0
+        if pca_optimization[-2:] == 'fd':
+            pca_optimization = pca_optimization[:-2]
+            pca_frequent_direction = True
+        if pca_optimization not in ['npm', 'npmfd', 'history']:
+            assert isinstance(lr_pca, (int, float)) and lr_pca > 0
+        if pca_optimization in ['landing']:
+            assert isinstance(landing_lambda, float) and landing_lambda > 0
+
+        ## Randomness
+        if seed is None:
+            import numpy as _np
+            from sys import maxsize
+            seed = _np.random.randint(0,maxsize)
+        self.key = random.PRNGKey(seed)
+        self.n_iter = n_iter
+        self.k = target_dim
+        if constraint in ['covariance', 'all']:
+            self.r = rank
+
+        ## Buffers
+        self.buffer = Buffer()
+
+        ## Optimality
+        self.total_var, self.V_star = self.get_ground_truth(self.k, rank, mode=None)
+        self.exp_var_gt, self.V_ground_truth = None, None
+        if constraint in ['mean', 'covariance', 'all']:
+            self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(self.k, rank, mode=constraint)
+        
+        ## Optimization variables
+        f, R = None, None
+        if constraint in ['covariance', 'all']:
+            self.key, rng = random.split(self.key)
+            R, _ = np.linalg.qr(random.normal(rng, (self.d, rank)))
+        self.key, rng = random.split(self.key)
+        V, _ = np.linalg.qr(random.normal(rng, (self.d, self.k)))
+        self.evaluate(V=V, R=R)
+
+        ## SUBSPACE ESTIMATION
+        if constraint in ['mean', 'covariance', 'all']:
+            n_global_group = [0 for _ in range(self.num_groups)]  # n per group
+            if constraint != 'covariance':
+                mean_global_group = [np.zeros(self.d) for _ in range(self.num_groups)]
+            B_R, D_R = None, None
+            if subspace_frequent_direction: B_R = np.zeros((self.d, 2*rank))
+            if subspace_optimization == 'history': D_R = np.zeros(rank)
+
+            pbar = trange(1, n_iter_inner+1)
+            for t in pbar:
+                N, f, R, n_global_group, mean_global_group = self.subspace_estimation(
+                    R, t, self.r, batch_size_subspace, n_global_group, mean_global_group,
+                    constraint, subspace_optimization, subspace_frequent_direction, B_R, D_R
+                )
+                self.evaluate(R=R, f=f)
+                if verbose:
+                    desc = ""
+                    if constraint in ['mean', 'all']:
+                        desc += f"mu_gap_err={self.buffer.mu_gap_estim_err[-1]:.5f} "
+                    if constraint in ['covarinace', 'all']:
+                        desc += f"R_dist={self.buffer.R_dist[-1]:.5f} "
+                    pbar.set_description(desc)
+        
+        ## PCA OPTIMIZATION
+        n_global = 0
+        mean_global = np.zeros(self.d)
+        B_V, D_V = None, None
+        if pca_frequent_direction: B_V = np.zeros((self.d, 2*self.k))
+        if pca_optimization == 'history': D_V = np.zeros(self.k)
+        lr_pca0 = lr_pca
+        pbar = trange(1, n_iter+1)
+        for t in pbar:
+            _V = V.copy()       # store previous V
+            if lr_scheduler is not None and lr_pca is not None: lr_pca = lr_pca0 * lr_scheduler(t)
+
+            ## Before Sampling
+            mean_local = np.zeros(self.d)
+            cov_V =  np.zeros((self.d,self.k))
+            if constraint in ['mean', 'covariance', 'all']:
+                ## projection
+                V -= fairness_tradeoff * N @ N.T @ V
+
+            ## Sampling
+            for n_local in range(batch_size_pca):
+                _, x = self.sample()
+                mean_local *= n_local
+                mean_local += x
+                mean_local /= n_local+1
+                cov_V *= n_local
+                cov_V += np.outer(x, np.dot(x, V))
+                cov_V /= n_local+1
+                n_local += 1
+
+            ## After Sampling
+            # cov_V -= np.outer(mean_global, np.dot(mean_global, V))
+            mean_global *= n_global
+            mean_global += batch_size_pca * mean_local
+            mean_global /= n_global + batch_size_pca
+            n_global += n_local
+            if constraint in ['mean', 'covariance', 'all']:
+                ## projection
+                cov_V -= fairness_tradeoff * N @ N.T @ cov_V
+            
+            if pca_optimization == 'oja':
+                V += lr_pca * cov_V
+                V, _ = np.linalg.qr(V)
+            elif pca_optimization == 'npm':
+                V = cov_V
+                V, _ = np.linalg.qr(V)
+            elif pca_optimization == 'riemannian':
+                G = cov_V
+                riemannian_grad = (G - V @ (G.T @ V))
+                V += lr_pca * riemannian_grad
+                V, _ = np.linalg.qr(V)
+            elif pca_optimization == 'landing': 
+                G = cov_V
+                riemannian_grad = (G - V @ (G.T @ V))
+                field = V @ (V.T @ V) - V
+                V += lr_pca * (riemannian_grad + landing_lambda * field)
+            elif pca_optimization == 'history':
+                if t==1:
+                    S = V + cov_V
+                else:
+                    S = batch_size_pca * cov_V + (n_global - batch_size_pca) * _V @ np.diag(D_V) @ _V.T @ V
+                    S /= n_global
+                V, _ = np.linalg.qr(S)
+                D_V = np.linalg.norm(S, ord=2, axis=0)
+            if pca_frequent_direction:
+                B_V = B_V.at[:,-self.k:].set(V)
+                U_V, S_V, _ = np.linalg.svd(B_V, full_matrices=False)  # singular value in decreasing order
+                min_singular = np.square(S_V[self.k])
+                S_V = np.sqrt(np.clip(np.square(S_V)-min_singular, 0, None))
+                B_V = U_V @ np.diag(S_V)
+                V = B_V[:,:self.k]
+                V, _ = np.linalg.qr(V)
+            
+            self.evaluate(V=V)
+            if verbose:
+                desc = f"mu_err={np.linalg.norm(mean_global-self.mu):.5f} "
+                pbar.set_description(desc)
+            
+
+        return V
+    
+
+    def train_combined(self,
             target_dim,
             rank,
             n_iter,
@@ -673,217 +863,6 @@ class StreamingFairBlockPCA:
         return V
 
 
-    def train_block(self,
-            target_dim,
-            rank,
-            n_iter,
-            batch_size,
-            constraint='all',
-            center_by_mean='local',
-            subspace_optimization='oja',
-            pca_optimization='npm',
-            lr_pca=None,
-            n_iter_inner=1,
-            n_iter_history=None,
-            landing_lambda=None,
-            seed=None,
-            tol=None,
-            lr_scheduler=None,
-        ):
-        """
-        Streaminig Fair Block PCA Algorithm.
-        Will be deprecated.
-        """
-        ## Check arguments
-        assert isinstance(target_dim, int) and 0 < target_dim < self.d
-        assert isinstance(rank, int) and 0 < rank <= self.d
-        assert isinstance(n_iter, int) and n_iter > 0
-        assert isinstance(batch_size, int) and batch_size > 0
-        assert constraint in ['vanilla', 'mean', 'covariance', 'all'], constraint
-        assert center_by_mean in ['local', 'global', None], center_by_mean
-        if constraint != 'vanilla':
-            assert subspace_optimization in ['npm', 'npmfd', 'history', 'historyfd'], subspace_optimization
-        assert pca_optimization in ['oja', 'npm', 'ojafd', 'npmfd', 'riemannian', 'landing', 'history', 'historyfd'], pca_optimization
-        if pca_optimization not in ['npm', 'npmfd', 'history']:
-            assert isinstance(lr_pca, (int, float)) and lr_pca > 0
-        if subspace_optimization in ['history'] or pca_optimization in ['history']:
-            assert isinstance(n_iter_history, int) and n_iter_history > 0
-        if subspace_optimization in ['landing']:
-            assert isinstance(landing_lambda, float) and landing_lambda > 0
-
-        if seed is None:
-            import numpy as _np
-            from sys import maxsize
-            seed = _np.random.randint(0,maxsize)
-        self.key = random.PRNGKey(seed)
-        self.n_iter = n_iter
-        self.k = target_dim
-        if constraint in ['covariance', 'all']:
-            self.r = rank
-
-        ## Buffers
-        self.buffer = Buffer()
-        self.total_var, self.V_star = self.get_ground_truth(self.k, rank, mode=None)
-        self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(self.k, rank, mode=constraint)
-        
-        f = None
-        R = None
-        if constraint in ['covariance', 'all']:
-            self.key, rng = random.split(self.key)
-            R, _ = np.linalg.qr(random.normal(rng, (self.d, rank)))
-        self.key, rng = random.split(self.key)
-        V, _ = np.linalg.qr(random.normal(rng, (self.d, self.k)))
-        self.evaluate(V=V, R=R)
-
-        n_global = [0 for _ in range(self.num_groups)]  # n per group
-        group_mean_global = [np.zeros(self.d) for _ in range(self.num_groups)]
-        if subspace_optimization in ['npmfd', 'historyfd']: B_R = np.zeros((self.d, 2*rank))
-        if pca_optimization in ['npmfd', 'ojafd', 'historyfd']: B_V = np.zeros((self.d, 2*self.k))
-        if subspace_optimization == 'history': D_R = np.zeros((rank, rank))
-        if pca_optimization == 'history': D_V = np.zeros((self.k, self.k))
-        lr_pca0 = lr_pca
-
-        pbar = trange(1, n_iter+1)
-        for t in pbar:
-            _V = V.copy()       # store previous V
-            if R is not None: _R = R.copy()       # store previous R
-            if lr_scheduler is not None and lr_pca is not None: lr_pca = lr_pca0 * lr_scheduler(t)
-            
-            ## Sampling
-            n_local = [0 for _ in range(self.num_groups)]  # n per group, local
-            A, X = [], []
-            
-            while min(n_local)<batch_size:
-                s, x = self.sample()
-                A.append(s)
-                X.append(x)
-                n_local[s] += 1
-            for s in range(self.num_groups):
-                n_global[s] += n_local[s]
-            A = np.array(A)
-            X = np.stack(X, 0)  # (batch_size, dim)
-            
-            group_mean_local = [np.zeros(self.d) for _ in range(self.num_groups)]
-            ## group-mean calculation
-            for s in range(self.num_groups):
-                group_mean_local[s] = np.mean(X[A==s], 0)
-                group_mean_global[s] = (n_global[s] - n_local[s]) / n_global[s] * group_mean_global[s] + (n_local[s]/n_global[s]) * group_mean_local[s]
-            if constraint == 'vanilla':
-                ## centering
-                if center_by_mean == 'local':
-                    X -= X.mean(0)
-                elif center_by_mean == 'global':
-                    mean_global = sum((n_global[s]/sum(n_global)) * group_mean_local[s] for s in range(self.num_groups))
-                    X -= mean_global
-                pass
-            else:
-                ## group-wise centering
-                for s in range(self.num_groups):
-                    if center_by_mean == 'local':
-                        X = X.at[A==s].set(X[A==s] - group_mean_local[s])
-                    elif center_by_mean == 'global':
-                        X = X.at[A==s].set(X[A==s] - group_mean_global[s])
-                if constraint in ['mean', 'all']:
-                    ## Mean gap
-                    f = group_mean_global[1] - group_mean_global[0]
-                    f /= np.linalg.norm(f)
-                    N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
-                if constraint in ['covariance', 'all']:
-                    ## Covariance gap (squared)
-                    def Q_hat_R(X, R):
-                        group_covR = [np.zeros((self.d, self.r)) for _ in range(self.num_groups)]
-                        for s in range(self.num_groups):
-                            group_covR[s] = X[A==s].T @ (X[A==s] @ R) / n_local[s]
-                        covdiff_R = group_covR[1] - group_covR[0]
-                        return covdiff_R
-                    
-                    for _ in range(n_iter_inner):
-                        if subspace_optimization == 'npm': 
-                            R = Q_hat_R(X,R)
-                            R, _ = np.linalg.qr(R)
-                        elif subspace_optimization == 'npmfd': 
-                            R = Q_hat_R(X,R)
-                            R, _ = np.linalg.qr(R)
-                            B_R = B_R.at[:,-self.r:].set(R)
-                            U_R, S_R, _ = np.linalg.svd(B_R, full_matrices=False)  # singular value in decreasing order
-                            min_singular = S_R[self.r] ** 2
-                            S_R = np.sqrt(np.clip(np.square(S_R)-min_singular, 0, None))
-                            B_R = U_R @ np.diag(S_R)
-                            R = B_R[:,:self.r]
-                            R, _ = np.linalg.qr(R)
-                    if subspace_optimization == 'history':
-                        for m in range(1,n_iter_history+1): 
-                            if t==1:
-                                S = R + Q_hat_R(X,R)
-                            else:
-                                S = (n_local[s]/n_global[s]) * Q_hat_R(X,R)  \
-                                    + ((n_global[s] - n_local[s])/n_global[s]) * _R @ D_R @ _R.T @ R
-                            R, _ = np.linalg.qr(S)
-                        D_R = np.diag(np.linalg.norm(S, ord=2, axis=0))
-
-                    N = R.copy()   # this line is used only when `constrain == 'covariance'`
-                if constraint == 'all':
-                    ## Normal subspace; for both mean & covariance gap
-                    N = np.concatenate([f.reshape(-1,1), R], 1)
-                    N, _ = np.linalg.qr(N)
-            
-            ## Gradient
-            def gradient(X,V):
-                if constraint == 'vanilla':  G = X.T @ X @ V / sum(n_local)
-                else:
-                    G = X.T @ X @ (V - N @ N.T @ V) / sum(n_local)
-                    G -= N @ N.T @ G
-                return G
-            ## Update
-            if pca_optimization == 'oja':
-                V += lr_pca * gradient(X,V)
-                V, _ = np.linalg.qr(V)
-            elif pca_optimization == 'npm':
-                V = gradient(X,V)
-                V, _ = np.linalg.qr(V)
-            elif pca_optimization == 'npmfd':
-                V = gradient(X,V)
-                V, _ = np.linalg.qr(V)
-                B_V = B_V.at[:,-self.k:].set(V)
-                U_V, S_V, _ = np.linalg.svd(B_V, full_matrices=False)  # singular value in decreasing order
-                min_singular = S_V[self.k] ** 2
-                S_V = np.sqrt(np.clip(np.square(S_V)-min_singular, 0, None))
-                B_V = U_V @ np.diag(S_V)
-                V = B_V[:,:self.k]
-                V, _ = np.linalg.qr(V)
-            elif pca_optimization == 'riemannian':
-                G = gradient(X,V)
-                riemannian_grad = (G - V @ (G.T @ V))
-                V += lr_pca * riemannian_grad
-                V, _ = np.linalg.qr(V)
-            elif pca_optimization == 'landing': 
-                G = gradient(X,V)
-                riemannian_grad = (G - V @ (G.T @ V))
-                field = V @ (V.T @ V) - V
-                V += lr_pca * (riemannian_grad + landing_lambda * field)
-            elif pca_optimization == 'history':
-                for m2 in range(1,n_iter_history+1): 
-                    if t==1:
-                        S = V + gradient(X,V)
-                    else:
-                        S = (sum(n_local)/sum(n_global)) * gradient(X,V)  \
-                            + ((sum(n_global) - sum(n_local))/sum(n_global)) * _V @ D_V @ _V.T @ V
-                    V, _ = np.linalg.qr(S)
-                D_V = np.diag(np.linalg.norm(S, ord=2, axis=0))
-            
-            self.evaluate(V=V, R=R, f=f)
-            if tol is not None:
-                _gr = grassmanian_distance(V, _V)
-                mean_global = sum([(n_global[s]/sum(n_global)) * group_mean_local[s] for s in range(self.num_groups)], start=np.zeros(self.d))
-                desc = f"mu_err={np.linalg.norm(mean_global):.5f} "
-                if constraint in ['mean', 'all']:
-                    desc += f"mu_gap_err={self.buffer.mu_gap_estim_err[-1]:.5f}"
-                pbar.set_description(desc)
-                if _gr < tol:
-                    print(f"OUTER: Broke in {t} / {n_iter}"); break
-        return V
-
-
     def transform(self, x:np.ndarray, V=None) -> np.ndarray:
         if V is None:
             assert hasattr(self, 'V'), 'Training is NOT done'
@@ -1027,7 +1006,7 @@ def run(args):
         n_iter_inner=args.n_iter_inner,
         landing_lambda=args.landing_lambda,
         seed=args.seed_train,
-        tol=args.tolerance,
+        verbose=args.tolerance,
         # lr_scheduler=None,
     )
 
