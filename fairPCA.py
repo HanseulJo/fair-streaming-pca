@@ -11,7 +11,8 @@ from tqdm.auto import trange
 
 def sin(A:jnp.ndarray, B:jnp.ndarray):
     assert A.shape == B.shape
-    cos = jnp.sum(A*B) / jnp.sqrt(jnp.square(A).sum() * jnp.square(B).sum())
+    denom = jnp.sqrt(jnp.square(A).sum() * jnp.square(B).sum())
+    cos = jnp.sum(A*B) / (denom + 1e-8)
     return jnp.sqrt(1-jnp.square(cos))
 
 
@@ -62,7 +63,7 @@ class StreamingFairBlockPCA:
             num_groups=2,
             probability=0.5,
             seed=None,
-            nullity=None,
+            rank=None,
             mu_scale = 1.,
             eps = 0.1,
             max_cov_eig0 = 2.,
@@ -95,14 +96,14 @@ class StreamingFairBlockPCA:
             assert num_attributes == 1 and num_groups == 2, f"Requires binary-group single-attribute fairness if `probability` is a float"
         else: #  isinstance(probability, Iterable):
             raise NotImplementedError
-        if nullity is not None:
-            assert isinstance(nullity, int) and 0 <= nullity <= data_dim, f"Invalid rank: {nullity}"
+        if rank is not None:
+            assert isinstance(rank, int) and 0 <= rank <= data_dim, f"Invalid rank: {rank}"
 
         self.d = data_dim
         self.num_attr = num_attributes
         self.num_groups = num_groups
         self.p = probability
-        self._r = nullity if nullity is not None else (data_dim // 2)
+        self._r = rank if rank is not None else (data_dim // 2)
 
         ## Random generator
         # rng = np.random.default_rng(seed) 
@@ -193,8 +194,10 @@ class StreamingFairBlockPCA:
             - groud_truth (jnp.ndarray) : size=(data_dim, target_dim)
         """
         assert isinstance(target_dim, int) and 0 < target_dim < self.d, f"Invalid target_dim: {target_dim}"
-        g = self.mu_gap / jnp.linalg.norm(self.mu_gap)
-
+        g = self.mu_gap 
+        norm_g = jnp.linalg.norm(self.mu_gap)
+        if not jnp.isclose(norm_g, 0):
+            g /= norm_g
 
         if mode == 'mean':
             R = null_space(g.reshape(1,-1))
@@ -336,7 +339,7 @@ class StreamingFairBlockPCA:
         R = None
         if constraint in ['mean', 'all']:
             ## Mean gap
-            f = self.mu_gap / jnp.linalg.norm(self.mu_gap)
+            f = self.mu_gap / (jnp.linalg.norm(self.mu_gap) + 1e-8)
             N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
         if constraint in ['covariance','all']:
             ## Covariance gap
@@ -358,8 +361,11 @@ class StreamingFairBlockPCA:
         
         if constraint == 'all':
             ## Normal subspace; for both mean & covariance gap
-            N = jnp.concatenate([f.reshape(-1,1), R], 1)
-            N, _ = jnp.linalg.qr(N)
+            if jnp.isclose(jnp.linalg.norm(f), 0):
+                N = R.copy()
+            else:
+                N = jnp.concatenate([f.reshape(-1,1), R], 1)
+                N, _ = jnp.linalg.qr(N)
         
         lr0 = lr
         pbar = trange(1, n_iter+1)
@@ -467,7 +473,7 @@ class StreamingFairBlockPCA:
         if constraint in ['mean', 'all']:
             ## Mean gap
             f = mean_global_group[1] - mean_global_group[0]
-            f /= jnp.linalg.norm(f)
+            f /= (jnp.linalg.norm(f) + 1e-8)
             N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
 
         if constraint in ['covariance', 'all']:
@@ -497,8 +503,11 @@ class StreamingFairBlockPCA:
                         
         if constraint == 'all':
             ## Normal subspace; for both mean & covariance gap
-            N = jnp.concatenate([R, f.reshape(-1,1)], 1)
-            N, _ = jnp.linalg.qr(N)
+            if jnp.isclose(jnp.linalg.norm(f), 0):
+                N = R.copy()
+            else:
+                N = jnp.concatenate([f.reshape(-1,1), R], 1)
+                N, _ = jnp.linalg.qr(N)
         
         return N, f, R, n_global_group, mean_global_group
 
@@ -926,7 +935,7 @@ def get_args():
     ## Data Generation
     parser.add_argument('-d', '--data_dim', type=int, default=100)
     parser.add_argument('-p', '--probability', type=float, default=0.5)
-    parser.add_argument('-R', '--nullity', type=int, default=10)
+    parser.add_argument('-R', '--rank_eff', type=int, default=10)
     parser.add_argument('--seed_data', type=int, default=None)
     parser.add_argument('--mu_scale', type=float, default=1.)
     parser.add_argument('--eps', type=float, default=0.1)
@@ -956,7 +965,7 @@ def run(args):
         num_attributes=1,
         num_groups=2,
         probability=args.probability,
-        nullity=args.nullity,
+        rank=args.rank_eff,
         seed=args.seed_data,
         mu_scale=args.mu_scale,
         eps=args.eps,
