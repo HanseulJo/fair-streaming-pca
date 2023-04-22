@@ -173,6 +173,7 @@ dependencies:
   - wheel=0.38.4=py311hca03da5_0
   - widgetsnbextension=4.0.5=py311hca03da5_0
   - xz=5.2.10=h80987f9_1
+  - yaml=0.2.5=h1a28f6b_0
   - zeromq=4.3.4=hc377ac9_0
   - zlib=1.2.13=h5a0b063_0
   - zstd=1.5.5=hd90d995_0
