@@ -447,38 +447,27 @@ class StreamingFairBlockPCA:
             cov_R_group = [jnp.zeros((self.d, rank)) for _ in range(self.num_groups)]
 
         ## Sampling
-        # while min(n_local_group)<batch_size and not (sum(n_local_group)>=2*batch_size and min(n_local_group)>0):
-        while min(n_local_group)<batch_size:
+        for _ in range(batch_size):
             s, x = self.sample()
             if constraint in ['mean', 'all']:
-                mean_local_group[s] *= n_local_group[s]
                 mean_local_group[s] += x
-                mean_local_group[s] /= n_local_group[s]+1
             if constraint in ['covariance', 'all']:
-                cov_R_group[s] *= n_local_group[s]
                 cov_R_group[s] += jnp.outer(x, jnp.dot(x, R))
-                cov_R_group[s] /= n_local_group[s]+1
             n_local_group[s] += 1
         
         ## After Sampling
         for s in range(self.num_groups):
-            # if constraint in ['covariance', 'all']:
-            #     cov_R_group[s] -= np.outer(mean_global_group[s], np.dot(mean_global_group[s], R))
+            mean_local_group[s] /= batch_size
+            cov_R_group[s] /= batch_size
             if constraint in ['mean', 'all']:
                 mean_global_group[s] *= n_global_group[s]
                 mean_global_group[s] += n_local_group[s] * mean_local_group[s]
                 mean_global_group[s] /= n_global_group[s] + n_local_group[s]
             n_global_group[s] += n_local_group[s]
 
-        if constraint in ['mean', 'all']:
-            ## Mean gap
-            f = mean_global_group[1] - mean_global_group[0]
-            f /= (jnp.linalg.norm(f) + 1e-8)
-            N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
-
         if constraint in ['covariance', 'all']:
             ## Covariance gap
-            covdiff_R = cov_R_group[1] - cov_R_group[0]
+            covdiff_R = (n_local_group[0] * cov_R_group[1] - n_local_group[1] * cov_R_group[0]) / batch_size
             if subspace_optimization == 'npm': 
                 R = covdiff_R
                 R, _ = jnp.linalg.qr(R)
@@ -498,18 +487,8 @@ class StreamingFairBlockPCA:
                 B_R = U_R @ jnp.diag(S_R)
                 R = B_R[:,:self.r]
                 R, _ = jnp.linalg.qr(R)
-
-            N = R.copy()   # this line is used only when `constrain == 'covariance'`
-                        
-        if constraint == 'all':
-            ## Normal subspace; for both mean & covariance gap
-            if jnp.isclose(jnp.linalg.norm(f), 0):
-                N = R.copy()
-            else:
-                N = jnp.concatenate([f.reshape(-1,1), R], 1)
-                N, _ = jnp.linalg.qr(N)
         
-        return N, f, R, n_global_group, mean_global_group
+        return R, n_global_group, mean_global_group
 
 
     def train(self,
@@ -595,18 +574,35 @@ class StreamingFairBlockPCA:
 
             pbar = trange(1, n_iter_inner+1)
             for t in pbar:
-                N, f, R, n_global_group, mean_global_group = self.subspace_estimation(
+                R, n_global_group, mean_global_group = self.subspace_estimation(
                     R, t, self.r, batch_size_subspace, n_global_group, mean_global_group,
                     constraint, subspace_optimization, subspace_frequent_direction, B_R, D_R
                 )
-                self.evaluate(R=R, f=f)
+                self.evaluate(R=R)
                 if verbose:
                     desc = ""
-                    if constraint in ['mean', 'all']:
-                        desc += f"mu_gap_err={self.buffer.mu_gap_estim_err[-1]:.5f} "
                     if constraint in ['covarinace', 'all']:
                         desc += f"R_dist={self.buffer.R_dist[-1]:.5f} "
                     pbar.set_description(desc)
+
+            if constraint in ['mean', 'all']:
+                ## Mean gap
+                assert n_iter_inner * batch_size_subspace == sum(n_global_group), (n_iter_inner * batch_size_subspace, sum(n_global_group))
+                f = (n_global_group[0] * mean_global_group[1] - n_global_group[1] * mean_global_group[0]) / (n_iter_inner * batch_size_subspace-1)
+                f /= (jnp.linalg.norm(f) + 1e-8)
+                self.evaluate(f=f)
+                N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
+
+            if constraint in ['covariance', 'all']:
+                N = R.copy()   # this line is used only when `constrain == 'covariance'`
+                            
+            if constraint == 'all':
+                ## Normal subspace; for both mean & covariance gap
+                if jnp.isclose(jnp.linalg.norm(f), 0):
+                    N = R.copy()
+                else:
+                    N = jnp.concatenate([f.reshape(-1,1), R], 1)
+                    N, _ = jnp.linalg.qr(N)
         
         ## PCA OPTIMIZATION
         n_global = 0
@@ -683,7 +679,10 @@ class StreamingFairBlockPCA:
             
             self.evaluate(V=V)
             if verbose:
-                desc = f"mu_err={jnp.linalg.norm(mean_global-self.mu):.5f} "
+                desc = "" 
+                if constraint in ['mean', 'all']:
+                    desc += f"mu_gap_err={self.buffer.mu_gap_estim_err[-1]:.5f} "
+                desc += f"mu_err={jnp.linalg.norm(mean_global-self.mu):.5f} "
                 pbar.set_description(desc)
             
 
