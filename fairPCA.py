@@ -174,6 +174,7 @@ class StreamingFairBlockPCA:
             eigenvalues, eigenvectors = jnp.linalg.eigh(eval(f"self.Sigma{s}"))
             self.group_vars[s] = jnp.sum(eigenvalues)
             self.group_V_stars[s] = eigenvectors
+        _, self.eigvec_Q_hat,= jnp.linalg.eigh(self.Sigma_gap + (jnp.outer(self.mu1,self.mu1) - jnp.outer(self.mu0, self.mu0)))
     
 
     def get_ground_truth(self,
@@ -287,6 +288,7 @@ class StreamingFairBlockPCA:
         if R is not None:
             r = R.shape[1]
             R_true = self.eigvec_Sigma_gap_sq[:,-r:]
+            # R_true = self.eigvec_Q_hat[:,:r]
             self.buffer.R_dist.append(grassmanian_distance(R, R_true))
         if f is not None:
             self.buffer.mu_gap_estim_err.append(sin(f, self.mu_gap))
@@ -354,7 +356,8 @@ class StreamingFairBlockPCA:
 
         if constraint in ['mena', 'covariance', 'all']:
             for _ in trange(1, n_iter_inner+1):
-                G = self.Sigma_gap @ R
+                # G = self.Sigma_gap @ R
+                G = (self.Sigma_gap + (jnp.outer(self.mu1,self.mu1) - jnp.outer(self.mu0, self.mu0))) @ R
                 if subspace_optimization == 'pm': R = G
                 R, _ = jnp.linalg.qr(R)
                 self.evaluate(R=R)
@@ -448,7 +451,8 @@ class StreamingFairBlockPCA:
 
         ## Sampling
         # while min(n_local_group)<batch_size and not (sum(n_local_group)>=2*batch_size and min(n_local_group)>0):
-        while min(n_local_group)<batch_size:
+        # while min(n_local_group)<batch_size:
+        while sum(n_local_group)<batch_size or min(n_local_group) == 0:
             s, x = self.sample()
             if constraint in ['mean', 'all']:
                 mean_local_group[s] *= n_local_group[s]
@@ -587,8 +591,7 @@ class StreamingFairBlockPCA:
         ## SUBSPACE ESTIMATION
         if constraint in ['mean', 'covariance', 'all']:
             n_global_group = [0 for _ in range(self.num_groups)]  # n per group
-            if constraint != 'covariance':
-                mean_global_group = [jnp.zeros(self.d) for _ in range(self.num_groups)]
+            mean_global_group = [jnp.zeros(self.d) for _ in range(self.num_groups)]
             B_R, D_R = None, None
             if subspace_frequent_direction: B_R = jnp.zeros((self.d, 2*rank))
             if subspace_optimization == 'history': D_R = jnp.zeros(rank)
@@ -604,7 +607,7 @@ class StreamingFairBlockPCA:
                     desc = ""
                     if constraint in ['mean', 'all']:
                         desc += f"mu_gap_err={self.buffer.mu_gap_estim_err[-1]:.5f} "
-                    if constraint in ['covarinace', 'all']:
+                    if constraint in ['covariance', 'all']:
                         desc += f"R_dist={self.buffer.R_dist[-1]:.5f} "
                     pbar.set_description(desc)
         
