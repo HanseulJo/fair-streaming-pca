@@ -502,7 +502,7 @@ class StreamingFairBlockPCA:
             batch_size_pca,
             constraint='all',
             subspace_optimization='npm',
-            pca_optimization='oja',
+            pca_optimization='npm',
             n_iter_inner=None,
             lr_pca=None,
             landing_lambda=None,
@@ -628,19 +628,18 @@ class StreamingFairBlockPCA:
             ## Sampling
             for n_local in range(batch_size_pca):
                 _, x = self.sample()
-                mean_local *= n_local
-                mean_local += x
-                mean_local /= n_local+1
-                cov_V *= n_local
-                cov_V += jnp.outer(x, jnp.dot(x, V))
-                cov_V /= n_local+1
-                n_local += 1
+                # mean_local *= n_local
+                mean_local += x / batch_size_pca
+                # mean_local /= n_local+1
+                # cov_V *= n_local
+                cov_V += jnp.outer(x, jnp.dot(x, V)) / batch_size_pca
+                # cov_V /= n_local+1
 
             ## After Sampling
             # cov_V -= np.outer(mean_global, np.dot(mean_global, V))
             mean_global *= n_global
             mean_global += batch_size_pca * mean_local
-            mean_global /= n_global + batch_size_pca
+            mean_global /= n_global + n_local
             n_global += n_local
             if constraint in ['mean', 'covariance', 'all']:
                 ## projection
