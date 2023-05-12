@@ -47,7 +47,7 @@ class Buffer:
     def __init__(self):
         self.explained_variance_ratio = []   # objective function, [0, 1]
         self.distance_from_gt = []           # Grassmanian distance of V and V_ground_truth
-        self.R_dist = []                     # Grassmanian distance of R and R_opt
+        self.W_dist = []                     # Grassmanian distance of W and W_opt
         self.projected_mean_diff = []        # intensity of mean equalization
         self.projected_cov_diff = []         # intensity of covariance equalization
         self.mu_gap_estim_err = []           # cosine between mu_gap and f
@@ -201,22 +201,22 @@ class StreamingFairBlockPCA:
             g /= norm_g
 
         if mode == 'mean':
-            R = null_space(g.reshape(1,-1))
+            W = null_space(g.reshape(1,-1))
         elif mode == 'covariance':
-            R = self.eigvec_Sigma_gap_sq[:,:self.d-rank]
+            W = self.eigvec_Sigma_gap_sq[:,:self.d-rank]
         elif mode == 'all': 
             N = self.eigvec_Sigma_gap_sq[:,-rank:]
             N = jnp.concatenate([g.reshape(-1,1), N], 1)
             N, _ = jnp.linalg.qr(N)
             RR = jnp.eye(self.d) - N @ N.T
             D, Q = jnp.linalg.eigh(RR)
-            R = Q @ jnp.diag(jnp.sqrt(jnp.abs(D)))
+            W = Q @ jnp.diag(jnp.sqrt(jnp.abs(D)))
         else:
             return self.eigval_Sigma[-target_dim:].sum(), self.eigvec_Sigma[:,-target_dim:]
-        M = R.T @ self.Sigma @ R
+        M = W.T @ self.Sigma @ W
         eigval, eigvec = jnp.linalg.eigh(M)
         explained_variance = jnp.sum(eigval[-target_dim:])
-        ground_truth = R @ eigvec[:,-target_dim:]
+        ground_truth = W @ eigvec[:,-target_dim:]
         # if mode in ['mean', 'all']:
         #     assert np.max(np.abs(ground_truth.T @ self.mu_gap)) < 1e-6, \
         #         f"Failed to equalizing means, {np.max(np.abs(ground_truth.T @ self.mu_gap))}"
@@ -273,7 +273,7 @@ class StreamingFairBlockPCA:
         return max(abs(exp_var_ratio - exp_var_group_ratios[s]) for s in range(self.num_groups))
 
 
-    def evaluate(self, V:jnp.ndarray=None, R:jnp.ndarray=None, f:jnp.ndarray=None, rank=None, mode='vanilla'):
+    def evaluate(self, V:jnp.ndarray=None, W:jnp.ndarray=None, f:jnp.ndarray=None, rank=None, mode='vanilla'):
         if V is not None:
             VVT = V @ V.T
             k = V.shape[1]
@@ -285,11 +285,10 @@ class StreamingFairBlockPCA:
                 self.buffer.distance_from_gt.append(jnp.linalg.norm(self.V_ground_truth @ self.V_ground_truth.T - VVT))
             self.buffer.projected_mean_diff.append(jnp.linalg.norm(self.mu_gap.T @ V))
             self.buffer.projected_cov_diff.append(jnp.linalg.norm(V.T @ self.Sigma_gap @ V))
-        if R is not None:
-            r = R.shape[1]
-            R_true = self.eigvec_Sigma_gap_sq[:,-r:]
-            # R_true = self.eigvec_Q_hat[:,:r]
-            self.buffer.R_dist.append(grassmanian_distance(R, R_true))
+        if W is not None:
+            r = W.shape[1]
+            W_true = self.eigvec_Sigma_gap_sq[:,-r:]
+            self.buffer.W_dist.append(grassmanian_distance(W, W_true))
         if f is not None:
             self.buffer.mu_gap_estim_err.append(sin(f, self.mu_gap))
 
@@ -338,7 +337,7 @@ class StreamingFairBlockPCA:
         if constraint in ['mean', 'covariance', 'all']:
             self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(self.k, rank, mode=constraint)
 
-        R = None
+        W = None
         if constraint in ['mean', 'all']:
             ## Mean gap
             f = self.mu_gap / (jnp.linalg.norm(self.mu_gap) + 1e-8)
@@ -346,34 +345,35 @@ class StreamingFairBlockPCA:
         if constraint in ['covariance','all']:
             ## Covariance gap
             key, rng = random.split(key)
-            R, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.r)))
-            N = R.copy()   # this line is used only when `constrain == 'covariance'`
+            W, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.r)))
+            N = W.copy()   # this line is used only when `constrain == 'covariance'`
 
         # V, _ = np.linalg.qr(rng.standard_normal((self.d, self.k)))
         key, rng = random.split(key)
         V, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.k)))
-        self.evaluate(V=V, R=R)
+        self.evaluate(V=V, W=W)
 
-        if constraint in ['mena', 'covariance', 'all']:
+        if constraint in ['mean', 'covariance', 'all']:
             for _ in trange(1, n_iter_inner+1):
                 # G = self.Sigma_gap @ R
-                G = (self.Sigma_gap + (jnp.outer(self.mu1,self.mu1) - jnp.outer(self.mu0, self.mu0))) @ R
-                if subspace_optimization == 'pm': R = G
-                R, _ = jnp.linalg.qr(R)
-                self.evaluate(R=R)
+                G = (self.Sigma_gap + (jnp.outer(self.mu1,self.mu1) - jnp.outer(self.mu0, self.mu0))) @ W
+                if subspace_optimization == 'pm': W = G
+                W, _ = jnp.linalg.qr(W)
+                self.evaluate(W=W)
         
         if constraint == 'all':
             ## Normal subspace; for both mean & covariance gap
             if jnp.isclose(jnp.linalg.norm(f), 0):
-                N = R.copy()
+                N = W.copy()
+            elif jnp.isclose(jnp.linalg.norm(W), 0):
+                N = f.copy()
             else:
-                N = jnp.concatenate([f.reshape(-1,1), R], 1)
+                N = jnp.concatenate([f.reshape(-1,1), W], 1)
                 N, _ = jnp.linalg.qr(N)
         
         lr0 = lr
         pbar = trange(1, n_iter+1)
         for t in pbar:
-            _V = V.copy()  # store previous V
             if lr_scheduler is not None:
                 lr = lr0 * lr_scheduler(t)
             ## Gradient
@@ -423,31 +423,31 @@ class StreamingFairBlockPCA:
     
 
     def subspace_estimation(self,
-            R,
+            W,
             t,
             rank,
             batch_size,
-            n_global_group,
+            b_global_group,
             mean_global_group,
             constraint,
             subspace_optimization,
             subspace_frequent_direction,
-            B_R=None,
-            D_R=None
+            B_W=None,
+            D_W=None
         ) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray, Iterable, Iterable]:
         """
         Orthogonal subspace estimation for Fair Streaming PCA.
         """
 
         f = None
-        if R is not None: _R = R.copy()       # store previous R
+        if W is not None: _W = W.copy()       # store previous R
 
         ## Before Sampling
-        n_local_group = [0 for _ in range(self.num_groups)]  # n per group, local
+        b_local_group = [0 for _ in range(self.num_groups)]  # n per group, local
         if constraint in ['mean', 'all']:
             mean_local_group = [jnp.zeros(self.d) for _ in range(self.num_groups)]
         if constraint in ['covariance', 'all']:
-            cov_R_group = [jnp.zeros((self.d, rank)) for _ in range(self.num_groups)]
+            cov_W_group = [jnp.zeros((self.d, rank)) for _ in range(self.num_groups)]
 
         ## Sampling
         for _ in range(batch_size):
@@ -455,43 +455,44 @@ class StreamingFairBlockPCA:
             if constraint in ['mean', 'all']:
                 mean_local_group[s] += x
             if constraint in ['covariance', 'all']:
-                cov_R_group[s] += jnp.outer(x, jnp.dot(x, R))
-            n_local_group[s] += 1
+                cov_W_group[s] += jnp.outer(x, jnp.dot(x, W))
+            b_local_group[s] += 1
         
         ## After Sampling
         for s in range(self.num_groups):
-            mean_local_group[s] /= batch_size
-            cov_R_group[s] /= batch_size
             if constraint in ['mean', 'all']:
-                mean_global_group[s] *= n_global_group[s]
-                mean_global_group[s] += n_local_group[s] * mean_local_group[s]
-                mean_global_group[s] /= n_global_group[s] + n_local_group[s]
-            n_global_group[s] += n_local_group[s]
+                mean_local_group[s] /= batch_size
+                mean_global_group[s] *= b_global_group[s]
+                mean_global_group[s] += b_local_group[s] * mean_local_group[s]
+                mean_global_group[s] /= b_global_group[s] + b_local_group[s]
+            if constraint in ['covariance', 'all']:
+                cov_W_group[s] /= batch_size
+            b_global_group[s] += b_local_group[s]
 
         if constraint in ['covariance', 'all']:
             ## Covariance gap
-            covdiff_R = (n_local_group[0] * cov_R_group[1] - n_local_group[1] * cov_R_group[0]) / batch_size
+            covdiff_W = (b_local_group[0] * cov_W_group[1] - b_local_group[1] * cov_W_group[0]) / batch_size
             if subspace_optimization == 'npm': 
-                R = covdiff_R
-                R, _ = jnp.linalg.qr(R)
+                W = covdiff_W
+                W, _ = jnp.linalg.qr(W)
             elif subspace_optimization == 'history':
                 if t==1:
-                    S = R + covdiff_R
+                    S = W + covdiff_W
                 else:
-                    S = (n_local_group[s]/n_global_group[s]) * covdiff_R  \
-                        + ((n_global_group[s] - n_local_group[s])/n_global_group[s]) * _R @ jnp.diag(D_R) @ _R.T @ R
-                R, _ = jnp.linalg.qr(S)
-                D_R = jnp.linalg.norm(S, ord=2, axis=0)
+                    S = (b_local_group[s]/b_global_group[s]) * covdiff_W  \
+                        + ((b_global_group[s] - b_local_group[s])/b_global_group[s]) * _W @ jnp.diag(D_W) @ _W.T @ W
+                W, _ = jnp.linalg.qr(S)
+                D_W = jnp.linalg.norm(S, ord=2, axis=0)
             if subspace_frequent_direction:
-                B_R = B_R.at[:,-self.r:].set(R)
-                U_R, S_R, _ = jnp.linalg.svd(B_R, full_matrices=False)  # singular value in decreasing order
-                min_singular = jnp.square(S_R[self.r])
-                S_R = jnp.sqrt(jnp.clip(jnp.square(S_R)-min_singular, 0, None))
-                B_R = U_R @ jnp.diag(S_R)
-                R = B_R[:,:self.r]
-                R, _ = jnp.linalg.qr(R)
+                B_W = B_W.at[:,-self.r:].set(W)
+                U_W, S_W, _ = jnp.linalg.svd(B_W, full_matrices=False)  # singular value in decreasing order
+                min_singular = jnp.square(S_W[self.r])
+                S_W = jnp.sqrt(jnp.clip(jnp.square(S_W)-min_singular, 0, None))
+                B_W = U_W @ jnp.diag(S_W)
+                W = B_W[:,:self.r]
+                W, _ = jnp.linalg.qr(W)
         
-        return R, n_global_group, mean_global_group
+        return W, b_global_group, mean_global_group
 
 
     def train(self,
@@ -558,33 +559,33 @@ class StreamingFairBlockPCA:
             self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(self.k, rank, mode=constraint)
         
         ## Optimization variables
-        f, R = None, None
+        f, W = None, None
         if constraint in ['covariance', 'all']:
             self.key, rng = random.split(self.key)
-            R, _ = jnp.linalg.qr(random.normal(rng, (self.d, rank)))
+            W, _ = jnp.linalg.qr(random.normal(rng, (self.d, rank)))
         self.key, rng = random.split(self.key)
         V, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.k)))
-        self.evaluate(V=V, R=R)
+        self.evaluate(V=V, W=W)
 
         ## SUBSPACE ESTIMATION
         if constraint in ['mean', 'covariance', 'all']:
             n_global_group = [0 for _ in range(self.num_groups)]  # n per group
             mean_global_group = [jnp.zeros(self.d) for _ in range(self.num_groups)]
-            B_R, D_R = None, None
-            if subspace_frequent_direction: B_R = jnp.zeros((self.d, 2*rank))
-            if subspace_optimization == 'history': D_R = jnp.zeros(rank)
+            B_Q, D_Q = None, None
+            if subspace_frequent_direction: B_Q = jnp.zeros((self.d, 2*rank))
+            if subspace_optimization == 'history': D_Q = jnp.zeros(rank)
 
             pbar = trange(1, n_iter_inner+1)
             for t in pbar:
-                R, n_global_group, mean_global_group = self.subspace_estimation(
-                    R, t, self.r, batch_size_subspace, n_global_group, mean_global_group,
-                    constraint, subspace_optimization, subspace_frequent_direction, B_R, D_R
+                W, n_global_group, mean_global_group = self.subspace_estimation(
+                    W, t, self.r, batch_size_subspace, n_global_group, mean_global_group,
+                    constraint, subspace_optimization, subspace_frequent_direction, B_Q, D_Q
                 )
-                self.evaluate(R=R)
+                self.evaluate(W=W)
                 if verbose:
                     desc = ""
                     if constraint in ['covarinace', 'all']:
-                        desc += f"R_dist={self.buffer.R_dist[-1]:.5f} "
+                        desc += f"W_dist={self.buffer.W_dist[-1]:.5f} "
                     pbar.set_description(desc)
 
             if constraint in ['mean', 'all']:
@@ -596,14 +597,14 @@ class StreamingFairBlockPCA:
                 N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
 
             if constraint in ['covariance', 'all']:
-                N = R.copy()   # this line is used only when `constrain == 'covariance'`
+                N = W.copy()   # this line is used only when `constrain == 'covariance'`
                             
             if constraint == 'all':
                 ## Normal subspace; for both mean & covariance gap
                 if jnp.isclose(jnp.linalg.norm(f), 0):
-                    N = R.copy()
+                    N = W.copy()
                 else:
-                    N = jnp.concatenate([f.reshape(-1,1), R], 1)
+                    N = jnp.concatenate([f.reshape(-1,1), W], 1)
                     N, _ = jnp.linalg.qr(N)
         
         ## PCA OPTIMIZATION
@@ -626,21 +627,21 @@ class StreamingFairBlockPCA:
                 V -= fairness_tradeoff * N @ N.T @ V
 
             ## Sampling
-            for n_local in range(batch_size_pca):
+            for b_local in range(batch_size_pca):
                 _, x = self.sample()
-                # mean_local *= n_local
-                mean_local += x / batch_size_pca
-                # mean_local /= n_local+1
-                # cov_V *= n_local
-                cov_V += jnp.outer(x, jnp.dot(x, V)) / batch_size_pca
-                # cov_V /= n_local+1
+                mean_local *= b_local
+                mean_local += x
+                mean_local /= b_local+1
+                cov_V *= b_local
+                cov_V += jnp.outer(x, jnp.dot(x, V))
+                cov_V /= b_local+1
 
             ## After Sampling
             # cov_V -= np.outer(mean_global, np.dot(mean_global, V))
             mean_global *= n_global
             mean_global += batch_size_pca * mean_local
-            mean_global /= n_global + n_local
-            n_global += n_local
+            mean_global /= n_global + b_local
+            n_global += b_local
             if constraint in ['mean', 'covariance', 'all']:
                 ## projection
                 cov_V -= fairness_tradeoff * N @ N.T @ cov_V
@@ -751,13 +752,13 @@ class StreamingFairBlockPCA:
         if constraint in ['mean', 'covariance', 'all']:
             self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(self.k, rank, mode=constraint)
         
-        f, R = None, None
+        f, W = None, None
         if constraint in ['covariance', 'all']:
             self.key, rng = random.split(self.key)
-            R, _ = jnp.linalg.qr(random.normal(rng, (self.d, rank)))
+            W, _ = jnp.linalg.qr(random.normal(rng, (self.d, rank)))
         self.key, rng = random.split(self.key)
         V, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.k)))
-        self.evaluate(V=V, R=R)
+        self.evaluate(V=V, W=W)
 
         n_global = 0
         mean_global = jnp.zeros(self.d)
@@ -781,8 +782,8 @@ class StreamingFairBlockPCA:
             ## SUBSPACE ESTIMATION
             if constraint in ['mean', 'covariance', 'all']:
                 for _ in range(n_iter_inner):
-                    N, f, R, n_global_group, mean_global_group = self.subspace_estimation(
-                        R, t, self.r, batch_size_subspace, n_global_group, mean_global_group,
+                    N, f, W, n_global_group, mean_global_group = self.subspace_estimation(
+                        W, t, self.r, batch_size_subspace, n_global_group, mean_global_group,
                         constraint, subspace_optimization, subspace_frequent_direction, B_R, D_R
                     )
 
@@ -849,14 +850,14 @@ class StreamingFairBlockPCA:
                 V = B_V[:,:self.k]
                 V, _ = jnp.linalg.qr(V)
             
-            self.evaluate(V=V, R=R, f=f)
+            self.evaluate(V=V, W=W, f=f)
             if tol is not None:
                 # _gr = grassmanian_distance(V, _V)
                 desc = f"mu_err={jnp.linalg.norm(mean_global-self.mu):.5f} "
                 if constraint in ['mean', 'all']:
                     desc += f"mu_gap_err={self.buffer.mu_gap_estim_err[-1]:.5f} "
                 if constraint in ['covarinace', 'all']:
-                    desc += f"R_dist={self.buffer.R_dist[-1]:.5f} "
+                    desc += f"W_dist={self.buffer.W_dist[-1]:.5f} "
                 pbar.set_description(desc)
                 # if _gr < tol:
                 #     print(f"OUTER: Broke in {t} / {n_iter}"); break
@@ -913,11 +914,11 @@ class StreamingFairBlockPCA:
         #     ax.set_ylim(top=max(self.buffer.projected_cov_diff)+.01)
 
         ax = axes[1][2]
-        ax.plot(self.buffer.R_dist)
-        ax.set_title('Subspace Estimation:\n$|| RR^T - R_{opt}R_{opt}^T ||_F$')
+        ax.plot(self.buffer.W_dist)
+        ax.set_title('Subspace Estimation:\n$|| WW^T - W_{opt}W_{opt}^T ||_F$')
         ax.set_ylim(bottom=-0.01)
-        if len(self.buffer.R_dist) > 0:
-            ax.set_ylim(top=max(self.buffer.R_dist)+.01)
+        if len(self.buffer.W_dist) > 0:
+            ax.set_ylim(top=max(self.buffer.W_dist)+.01)
 
 
         fig.tight_layout()
@@ -954,7 +955,7 @@ def get_args():
     parser.add_argument('--landing_lambda', type=float, default=1)        # must be float when subspace_optimization == 'landing' 
     parser.add_argument('--n_iter_history', type=int, default=1)
     parser.add_argument('--seed_train', type=int, default=None)
-    parser.add_argument('--tolerance', type=float, default=None)
+    parser.add_argument('--verbose', action='store_true')
     args = parser.parse_args()
     return args
 
@@ -1006,7 +1007,7 @@ def run(args):
         n_iter_inner=args.n_iter_inner,
         landing_lambda=args.landing_lambda,
         seed=args.seed_train,
-        verbose=args.tolerance,
+        verbose=args.verbose,
         # lr_scheduler=None,
     )
 
