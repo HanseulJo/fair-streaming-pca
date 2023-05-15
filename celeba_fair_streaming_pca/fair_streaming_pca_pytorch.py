@@ -122,7 +122,7 @@ class FairStreamingPCA:
             self.f = (self.b_global_group[0] * self.mean_global_group[1] -  self.b_global_group[1] * self.mean_global_group[0]) / b_global
             if torch.isnan(self.f).any():
                 raise ValueError('nan f before normalization')
-            self.f /= (torch.linalg.norm(self.f.cpu()) + 1e-8)
+            self.f /= (torch.norm(self.f) + 1e-8)
             if self.constraint == 'mean':
                 self.N = torch.unsqueeze(self.f, -1)
 
@@ -131,15 +131,21 @@ class FairStreamingPCA:
                         
         if self.constraint == 'all':
             ## Normal subspace; for both mean & covariance gap
-            if torch.isclose(torch.norm(self.f), torch.zeros(1).to(self.device)):
+            # if torch.isclose(torch.norm(self.f), torch.zeros(1).to(self.device)):
+            #     self.N = self.W.clone()
+            # elif torch.isclose(torch.norm(self.W), torch.zeros(1).to(self.device)):
+            #     self.N = torch.unsqueeze(self.f, -1)
+            # else:
+            #     self.N = torch.cat([torch.unsqueeze(self.f, -1), self.W], -1)
+            #     self.N, _ = torch.linalg.qr(self.N.cpu())
+            #     self.N = self.N.to(self.device)
+            f2 = self.f - torch.einsum("cdm,cm->cd", self.W, torch.einsum("cdm,cd->cm",self.W, self.f))
+            f2_norm = torch.norm(f2).cpu()
+            if torch.isclose(f2_norm, torch.zeros(1)):
                 self.N = self.W.clone()
-            elif torch.isclose(torch.norm(self.W), torch.zeros(1).to(self.device)):
-                self.N = torch.unsqueeze(self.f, -1)
             else:
-                self.N = torch.cat([torch.unsqueeze(self.f, -1), self.W], -1)
-                self.N, _ = torch.linalg.qr(self.N.cpu())
-                self.N = self.N.to(self.device)
-
+                f2 /= (f2_norm + 1e-8)
+                self.N = torch.cat([self.W, torch.unsqueeze(f2, -1)], -1)
         
         if torch.isnan(self.N).any():
             raise ValueError('nan N')
@@ -174,6 +180,7 @@ class FairStreamingPCA:
                 self.mean_global_group[s] += b_local_group[s] * mean_local_group[s]
                 self.mean_global_group[s] /= self.b_global_group[s] + b_local_group[s]
             self.b_global_group[s] += b_local_group[s]
+            
 
         if self.constraint in ['covariance', 'all']:
             ## Covariance gap
@@ -191,6 +198,7 @@ class FairStreamingPCA:
                 self.B_W = torch.einsum("cdm,cmn->cdn", U, S).to(self.device)
                 self.W, _ = torch.linalg.qr(self.B_W[...,:self.m].cpu())
                 self.W = self.W.to(self.device)
+            
 
     def _principal_component_analysis(self, loader) -> None:
         b_global = 0
@@ -289,8 +297,7 @@ class FairStreamingPCA:
             bs, num_ch, h, w = x.size()
             x = x.view(bs, num_ch, h*w)
             proj_arr = torch.einsum("cdk,bcd->bck", self.V, x)
-            result = proj_arr.view(bs, num_ch, h, w)
-            return lambda_transform(result)
+            return lambda_transform(proj_arr)
 
     
     def _get_explained_variance_ratio(self, x, x_transformed=None):
@@ -313,20 +320,18 @@ class FairStreamingPCA:
         self.d = height*width
         b_local_group = [0 for _ in range(2)]
         Xs = [[], []]
-        Ss = []
         self.explained_variance_ratio_group = [0, 0]
         pbar = tqdm(loader, desc=f'Data Collection:')
         for img, label in pbar:
             x = img.view(batch_size, self.num_channel, -1)  # (batch_size, num_channel, height, width)
             ss = label[...,self.a]
-            Ss.append(ss)
             for s in range(2):
                 Xs[s].append(x[ss==s])
                 b_local_group[s] += (ss==s).sum()
         for s in range(2):
             Xs[s] = torch.cat(Xs[s]).to(self.device)  # (totalsize_s, num_channel, dim)
         X = torch.cat(Xs)  # (totalsize, num_channel, dim)
-        S = torch.cat(Ss).float().unsqueeze(-1).to(self.device)
+        S = torch.cat([torch.zeros(Xs[0].size(0)), torch.ones(Xs[1].size(0))]).float().unsqueeze(-1).to(self.device)
         X -= X.mean(0, keepdim=True) 
         S -= S.mean() # (totalsize, 1)
         if constraint in ['mean', 'all']:

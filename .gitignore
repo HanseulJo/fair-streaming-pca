@@ -1,6 +1,9 @@
 *.pdf
 */*.pdf
 .DS_Store
-__pycache__/*
+__pycache__/
 */datasets/
 .idea
+*/__pycache__/
+*/*/__pycache__/
+*/datasets.zip

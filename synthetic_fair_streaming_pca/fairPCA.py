@@ -16,6 +16,13 @@ def sin(A:jnp.ndarray, B:jnp.ndarray):
     return jnp.sqrt(1-jnp.square(cos))
 
 
+def sin_v2(A:jnp.ndarray, B:jnp.ndarray):
+    # assert jnp.isclose(jnp.linalg.norm(A, 2), 1)
+    # assert jnp.isclose(jnp.linalg.norm(B, 2), 1)
+    sin_square = B - A @ A.T @ B
+    return jnp.linalg.norm(sin_square, 2)
+
+
 def grassmanian_distance(A:jnp.ndarray, B:jnp.ndarray):
     """
     distance between matrix A and B with same size,
@@ -46,7 +53,10 @@ class Buffer:
     """
     def __init__(self):
         self.explained_variance_ratio = []   # objective function, [0, 1]
+        self.explained_variance_ratio_0 = []   # objective function, [0, 1]
+        self.explained_variance_ratio_1 = []   # objective function, [0, 1]
         self.distance_from_gt = []           # Grassmanian distance of V and V_ground_truth
+        self.sine_angle = []
         self.W_dist = []                     # Grassmanian distance of W and W_opt
         self.projected_mean_diff = []        # intensity of mean equalization
         self.projected_cov_diff = []         # intensity of covariance equalization
@@ -59,6 +69,10 @@ class StreamingFairBlockPCA:
     
     def __init__(self,
             data_dim,
+            mu0=None,
+            mu1=None,
+            Sigma0=None,
+            Sigma1=None,
             num_attributes=1,
             num_groups=2,
             probability=0.5,
@@ -115,66 +129,77 @@ class StreamingFairBlockPCA:
         ## Conditional mean vectors:
         ## (1-p) * mu0 + p * mu1 = 0  (Assuming true mean == zero vector)
         # mu_temp = rng.standard_normal(self.d)
-        key, rng = random.split(key)
-        mu_temp = random.normal(rng, (self.d,))
-        mu_temp *= mu_scale / jnp.linalg.norm(mu_temp) 
-        self.mu0 = mu_temp * self.p / (self.p - 1.)
-        self.mu1 = mu_temp
+        if mu0 is None and mu1 is None:
+            key, rng = random.split(key)
+            mu_temp = random.normal(rng, (self.d,))
+            mu_temp *= mu_scale / jnp.linalg.norm(mu_temp) 
+            self.mu0 = mu_temp * self.p / (self.p - 1.)
+            self.mu1 = mu_temp
+        elif mu0 is None:
+            self.mu1 = mu1
+            self.mu0 = mu1 * self.p / (self.p - 1.)
+        elif mu1 is None:
+            self.mu0 = mu0
+            self.mu1 = mu0 * (self.p - 1.) / self.p
         self.mu = (1-self.p) * self.mu0 + self.p * self.mu1
         self.mu_gap = self.mu1 - self.mu0   # f
         assert jnp.isclose(jnp.abs(self.mu).max(), 0.), f"mu is not close to 0."
         
         ## Conditional covariances:
-        ### 1. Orthogonal matrices W0 & W1 (sharing r same columns)
-        dim_gap_ = self.d-(self._r//2)
-        key, rng = random.split(key)
-        A_ = random.normal(rng, (self.d, self._r//2))
-        key, rng = random.split(key)
-        A0 = random.normal(rng, (self.d, dim_gap_))
-        A0 = jnp.concatenate([A_, A0], 1)
-        key, rng = random.split(key)
-        A1 = random.normal(rng, (self.d, dim_gap_))
-        A1 = jnp.concatenate([A_, A1], 1)
-        W0, _ = jnp.linalg.qr(A0)   # orthogonal
-        W1, _ = jnp.linalg.qr(A1)   # orthogonal
-        
-        ### 2. Eigenvalues D0 & D1 (sharing r same eigenvalues)
-        dim_gap = self.d-self._r
-        key, rng = random.split(key)
-        D0 = max_cov_eig0 * (1 + 0.1 * random.normal(rng, (self._r,)))  # main
-        key, rng = random.split(key)
-        D0 = jnp.concatenate([D0, max_cov_eig0 * (jnp.arange(2,dim_gap+2) ** (-1.) + 0.1 * random.normal(rng, (dim_gap,)))])  # power law decay
-        D0 = jnp.abs(D0)
-        key, rng = random.split(key)
-        D1 = max_cov_eig1 * (1 + 0.1 * random.normal(rng, (self._r,)))  # main
-        key, rng = random.split(key)
-        D1 = jnp.concatenate([D1, max_cov_eig1 * (jnp.arange(2,dim_gap+2) ** (-1.) + 0.1 * random.normal(rng, (dim_gap,)))])  # power law decay
-        D1 = jnp.abs(D1)
+        self.Sigma0 = Sigma0
+        self.Sigma1 = Sigma1
+        if Sigma0 is None or Sigma1 is None:
+            ### 1. Orthogonal matrices W0 & W1 (sharing r same columns)
+            dim_gap_ = self.d-(self._r//2)
+            key, rng = random.split(key)
+            A_ = random.normal(rng, (self.d, self._r//2))
+            if Sigma0 is None:
+                key, rng = random.split(key)
+                A0 = random.normal(rng, (self.d, dim_gap_))
+                A0 = jnp.concatenate([A_, A0], 1)
+                W0, _ = jnp.linalg.qr(A0)   # orthogonal
+            if Sigma1 is None:
+                key, rng = random.split(key)
+                A1 = random.normal(rng, (self.d, dim_gap_))
+                A1 = jnp.concatenate([A_, A1], 1)
+                W1, _ = jnp.linalg.qr(A1)   # orthogonal
+            
+            ### 2. Eigenvalues D0 & D1 (sharing r same eigenvalues)
+            dim_gap = self.d-self._r
+            if Sigma0 is None:
+                key, rng = random.split(key)
+                D0 = max_cov_eig0 * (1 + 0.1 * random.normal(rng, (self._r,)))  # main
+                key, rng = random.split(key)
+                D0 = jnp.concatenate([D0, max_cov_eig0 * (jnp.arange(2,dim_gap+2) ** (-1.) + 0.1 * random.normal(rng, (dim_gap,)))])  # power law decay
+                D0 = jnp.abs(D0)
+            if Sigma1 is None:
+                key, rng = random.split(key)
+                D1 = max_cov_eig1 * (1 + 0.1 * random.normal(rng, (self._r,)))  # main
+                key, rng = random.split(key)
+                D1 = jnp.concatenate([D1, max_cov_eig0 * (jnp.arange(2,dim_gap+2) ** (-1.) + 0.1 * random.normal(rng, (dim_gap,)))])  # power law decay
+                D1 = jnp.abs(D1)
 
-        ### 3. Eigen-Composition to make Sigma0 & Sigma1;
-        ###     rank(Sigma1 - Sigma0) <= d - r.
-        self.Sigma0 = W0 @ jnp.diag(D0) @ W0.T
-        self.Sigma1 = W1 @ jnp.diag(D1) @ W1.T
+            ### 3. Eigen-Composition to make Sigma0 & Sigma1;
+            ###     rank(Sigma1 - Sigma0) <= d - r.
+            if Sigma0 is None:
+                self.Sigma0 = W0 @ jnp.diag(D0) @ W0.T
+            if Sigma1 is None:
+                self.Sigma1 = W1 @ jnp.diag(D1) @ W1.T
         self.Sigma = (1-self.p) * self.Sigma0 + self.p * self.Sigma1 + self.p*(1-self.p) * jnp.outer(self.mu_gap, self.mu_gap)
         assert jnp.min(jnp.linalg.eigh(self.Sigma)[0]) >= 0, f"Invalid Sigma: non-PSD, {jnp.linalg.eigh(self.Sigma)[0]}"
         self.Sigma_gap = self.Sigma1 - self.Sigma0
         
         ## Info about gaps
-        # rank_Sigma_gap = np.linalg.matrix_rank(self.Sigma_gap, hermitian=True)
         self.trace_Sigma_gap = jnp.trace(self.Sigma_gap)
-        self.Sigma_gap_sq = self.Sigma_gap @ self.Sigma_gap
-        self.eigval_Sigma_gap_sq, self.eigvec_Sigma_gap_sq = jnp.linalg.eigh(self.Sigma_gap_sq)  # eigenvalue of Q^2 increasing order
-        # assert rank_Sigma_gap == dim_gap, f"Invalid rank(Sigma_gap)={rank_Sigma_gap} (> {dim_gap}=d-r)"  # This command checks rank validity 
+        self.Sigma_gap_sq = self.Sigma_gap @ self.Sigma_gap.T
+        self.eigval_Sigma_gap_sq, self.eigvec_Sigma_gap_sq = jnp.linalg.eigh(self.Sigma_gap_sq)  # eigenvalue of Q^2 in ascending order
         
         ## Optima / group-conditional optima
         self.eigval_Sigma, self.eigvec_Sigma = jnp.linalg.eigh(self.Sigma)  # eigenvalues in ascending order
-        # self.total_var, self.V_star = self.eigval_Sigma.sum(), self.eigvec_Sigma
-        self.group_vars, self.group_V_stars = [0]*num_groups, [0]*num_groups
-        for s in range(self.num_groups):
-            eigenvalues, eigenvectors = jnp.linalg.eigh(eval(f"self.Sigma{s}"))
-            self.group_vars[s] = jnp.sum(eigenvalues)
-            self.group_V_stars[s] = eigenvectors
-        _, self.eigvec_Q_hat,= jnp.linalg.eigh(self.Sigma_gap + (jnp.outer(self.mu1,self.mu1) - jnp.outer(self.mu0, self.mu0)))
+        self.eigval_Sigma0, self.eigvec_Sigma0 = jnp.linalg.eigh(self.Sigma0)
+        self.eigval_Sigma1, self.eigvec_Sigma1 = jnp.linalg.eigh(self.Sigma1)
+        self.Q_hat = self.Sigma_gap + (jnp.outer(self.mu1,self.mu1) - jnp.outer(self.mu0, self.mu0))
+        _, self.eigvec_Q_hat,= jnp.linalg.eigh(self.Q_hat @ self.Q_hat.T)
     
 
     def get_ground_truth(self,
@@ -195,31 +220,44 @@ class StreamingFairBlockPCA:
             - groud_truth (jnp.ndarray) : size=(data_dim, target_dim)
         """
         assert isinstance(target_dim, int) and 0 < target_dim < self.d, f"Invalid target_dim: {target_dim}"
-        g = self.mu_gap 
-        norm_g = jnp.linalg.norm(self.mu_gap)
-        if not jnp.isclose(norm_g, 0):
-            g /= norm_g
+        f = self.mu_gap 
+        # norm_f = jnp.linalg.norm(self.mu_gap)
+        # if not jnp.isclose(norm_f, 0):
+        #     f /= norm_f
 
+        Proj = None
         if mode == 'mean':
-            W = null_space(g.reshape(1,-1))
+            norm_f = jnp.linalg.norm(f)
+            if not jnp.isclose(norm_f, 0):
+                f /= norm_f
+                Proj = jnp.eye(self.d) - f.reshape(-1,1) @ f.reshape(1,-1)           
         elif mode == 'covariance':
-            W = self.eigvec_Sigma_gap_sq[:,:self.d-rank]
+            P = self.eigvec_Q_hat[:,:self.d-rank]
+            # P = self.eigvec_Sigma_gap_sq[:,:self.d-rank]  # wrong
+            Proj = P @ P.T
         elif mode == 'all': 
-            N = self.eigvec_Sigma_gap_sq[:,-rank:]
-            N = jnp.concatenate([g.reshape(-1,1), N], 1)
-            N, _ = jnp.linalg.qr(N)
-            RR = jnp.eye(self.d) - N @ N.T
-            D, Q = jnp.linalg.eigh(RR)
-            W = Q @ jnp.diag(jnp.sqrt(jnp.abs(D)))
-        else:
+            M = self.eigvec_Q_hat[:,-rank:]
+            P = self.eigvec_Q_hat[:,:self.d-rank]
+            # M = self.eigvec_Sigma_gap_sq[:,-rank:]  # wrong
+            # P = self.eigvec_Sigma_gap_sq[:,:self.d-rank]  # wrong
+            f_tilde = P @ P.T @ f.reshape(-1,1)
+            norm_f_tilde = jnp.linalg.norm(f_tilde)
+            if not jnp.isclose(norm_f_tilde, 0):
+                f_tilde /= norm_f_tilde
+                N = jnp.concatenate([M, f_tilde], 1)
+                Proj = jnp.eye(self.d) - N @ N.T
+            else:
+                print('f is in span(N)')
+                Proj = P @ P.T
+
+        if Proj is None:
             return self.eigval_Sigma[-target_dim:].sum(), self.eigvec_Sigma[:,-target_dim:]
-        M = W.T @ self.Sigma @ W
+        
+        M = Proj.T @ self.Sigma @ Proj
         eigval, eigvec = jnp.linalg.eigh(M)
+        # print(eigval)
         explained_variance = jnp.sum(eigval[-target_dim:])
-        ground_truth = W @ eigvec[:,-target_dim:]
-        # if mode in ['mean', 'all']:
-        #     assert np.max(np.abs(ground_truth.T @ self.mu_gap)) < 1e-6, \
-        #         f"Failed to equalizing means, {np.max(np.abs(ground_truth.T @ self.mu_gap))}"
+        ground_truth = Proj @ eigvec[:,-target_dim:]
         return explained_variance, ground_truth
     
     
@@ -233,11 +271,11 @@ class StreamingFairBlockPCA:
         :: Return
             - exp_var (float)
         """
-        assert hasattr(self, 'total_var')
+        assert hasattr(self, 'k')
         if VVT is not None:
-            return jnp.trace(self.Sigma @ VVT) / self.total_var
+            return jnp.trace(self.Sigma @ VVT) / self.eigval_Sigma[-self.k:].sum()
         else:
-            return jnp.trace(self.Sigma @ V @ V.T) / self.total_var
+            return jnp.trace(self.Sigma @ V @ V.T) / self.eigval_Sigma[-self.k:].sum()
 
 
     def get_group_explained_variance_ratio(self, s, V:jnp.ndarray=None, VVT:jnp.ndarray=None):
@@ -250,12 +288,12 @@ class StreamingFairBlockPCA:
         :: Return
             - exp_var (float)
         """
+        assert hasattr(self, 'k')
         assert isinstance(s, int) and 0 <= s < self.num_groups
-        assert hasattr(self, 'group_vars')
         if VVT is not None:
-            return jnp.trace(eval(f"self.Sigma{s}") @ VVT) / self.group_vars[s]
+            return jnp.trace(eval(f"self.Sigma{s}") @ VVT) / eval(f"self.eigval_Sigma{s}")[-self.k:].sum()
         else:
-            return jnp.trace(eval(f"self.Sigma{s}") @ V @ V.T) / self.group_vars[s]
+            return jnp.trace(eval(f"self.Sigma{s}") @ V @ V.T) / eval(f"self.eigval_Sigma{s}")[-self.k:].sum()
     
 
     def get_objective_unfairness(self, V:jnp.ndarray=None, VVT:jnp.ndarray=None):
@@ -281,13 +319,16 @@ class StreamingFairBlockPCA:
                 if rank is None and hasattr(self, 'r'): rank = self.r
                 self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(k, rank, mode=mode)
             self.buffer.explained_variance_ratio.append(self.get_explained_variance_ratio(VVT=VVT))
+            self.buffer.explained_variance_ratio_0.append(self.get_group_explained_variance_ratio(0, VVT=VVT))
+            self.buffer.explained_variance_ratio_1.append(self.get_group_explained_variance_ratio(1, VVT=VVT))
             if self.V_ground_truth is not None:
                 self.buffer.distance_from_gt.append(jnp.linalg.norm(self.V_ground_truth @ self.V_ground_truth.T - VVT))
+                self.buffer.sine_angle.append(sin_v2(self.V, self.V_ground_truth))
             self.buffer.projected_mean_diff.append(jnp.linalg.norm(self.mu_gap.T @ V))
             self.buffer.projected_cov_diff.append(jnp.linalg.norm(V.T @ self.Sigma_gap @ V))
         if W is not None:
             r = W.shape[1]
-            W_true = self.eigvec_Sigma_gap_sq[:,-r:]
+            W_true = self.eigvec_Q_hat[:,-r:]
             self.buffer.W_dist.append(grassmanian_distance(W, W_true))
         if f is not None:
             self.buffer.mu_gap_estim_err.append(sin(f, self.mu_gap))
@@ -317,7 +358,7 @@ class StreamingFairBlockPCA:
         if constraint != 'vanilla':
             assert subspace_optimization in ['pm']
             assert isinstance(n_iter_inner, int) and n_iter_inner > 0
-        assert pca_optimization in ['oja', 'pm', 'riemannian', 'landing']
+        assert pca_optimization in ['pm', 'oja', 'riemannian', 'landing']
         assert constraint in ['vanilla', 'mean', 'covariance', 'all']
 
         # rng = np.random.default_rng(seed)
@@ -333,69 +374,79 @@ class StreamingFairBlockPCA:
         ## Buffers
         self.buffer = Buffer()
         self.total_var, self.V_star = self.get_ground_truth(self.k, rank, mode=None)
-        self.exp_var_gt, self.V_ground_truth = None, None
-        if constraint in ['mean', 'covariance', 'all']:
-            self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(self.k, rank, mode=constraint)
+        self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(self.k, rank, mode=constraint)
 
         W = None
         if constraint in ['mean', 'all']:
             ## Mean gap
             f = self.mu_gap / (jnp.linalg.norm(self.mu_gap) + 1e-8)
-            N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
+            self.N = f.reshape(-1, 1)
         if constraint in ['covariance','all']:
             ## Covariance gap
             key, rng = random.split(key)
             W, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.r)))
-            N = W.copy()   # this line is used only when `constrain == 'covariance'`
+            self.N = W.copy()
 
         # V, _ = np.linalg.qr(rng.standard_normal((self.d, self.k)))
         key, rng = random.split(key)
-        V, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.k)))
-        self.evaluate(V=V, W=W)
+        self.V, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.k)))
+        self.evaluate(V=self.V, W=W)
 
-        if constraint in ['mean', 'covariance', 'all']:
+        # 1st phase (1) : covariance gap estimation
+        if constraint in ['covariance', 'all']:
             for _ in trange(1, n_iter_inner+1):
-                # G = self.Sigma_gap @ R
-                G = (self.Sigma_gap + (jnp.outer(self.mu1,self.mu1) - jnp.outer(self.mu0, self.mu0))) @ W
+                G = self.Q_hat @ W
+                # G = self.Sigma_gap @ W
                 if subspace_optimization == 'pm': W = G
                 W, _ = jnp.linalg.qr(W)
                 self.evaluate(W=W)
+            self.N = W.copy()
         
+        # 1st phase (2) : unfair subspace estimation
         if constraint == 'all':
-            ## Normal subspace; for both mean & covariance gap
-            if jnp.isclose(jnp.linalg.norm(f), 0):
-                N = W.copy()
-            elif jnp.isclose(jnp.linalg.norm(W), 0):
-                N = f.copy()
+            f_tilde = (jnp.eye(self.d) - W @ W.T) @ f.reshape(-1,1)
+            norm_f_tilde = jnp.linalg.norm(f_tilde)
+            if jnp.isclose(norm_f_tilde, 0):
+                print('f is in span(W)')
+                self.N = W.copy()
             else:
-                N = jnp.concatenate([f.reshape(-1,1), W], 1)
-                N, _ = jnp.linalg.qr(N)
-        
+                # self.N, _ = jnp.linalg.qr(jnp.concatenate([f.reshape(-1,1), W], 1))
+                f_tilde /= norm_f_tilde
+                self.N = jnp.concatenate([W, f_tilde], 1)
+
+        ## CHECKING CODE
+        # print(self.N.shape)
+        # print(self.eigvec_Q_hat[:,-self.r:].shape)
+        # print("mean gap: orthogonal?", jnp.linalg.norm((jnp.eye(self.d)-self.N@self.N.T) @ self.mu_gap))
+        # print("covariance gap? (N)", jnp.linalg.norm((jnp.eye(self.d)-self.N@self.N.T) @ self.eigvec_Q_hat[:,-self.r:]))
+        # print("covariance gap? (W)", jnp.linalg.norm(W.T @ self.eigvec_Q_hat[:,:self.d-self.r]))
+        # raise Exception
+
         lr0 = lr
         pbar = trange(1, n_iter+1)
         for t in pbar:
             if lr_scheduler is not None:
                 lr = lr0 * lr_scheduler(t)
             ## Gradient
-            if constraint == 'vanilla': G = self.Sigma @ V
+            if constraint == 'vanilla': G = self.Sigma @ self.V
             else: 
-                G = self.Sigma @ (V - fairness_tradeoff * N @ N.T @ V)
-                G -= fairness_tradeoff * N @ N.T @ G
+                G = self.Sigma @ (self.V - fairness_tradeoff * self.N @ self.N.T @ self.V)
+                G -= fairness_tradeoff * self.N @ self.N.T @ G
             ## Update
-            if pca_optimization == 'oja':   V += lr * G
-            elif pca_optimization == 'pm':  V = G
+            if pca_optimization == 'oja':   self.V += lr * G
+            elif pca_optimization == 'pm':  self.V = G
             elif pca_optimization == 'riemannian': 
-                riemannian_grad = (G - V @ (G.T @ V))
-                V += lr * riemannian_grad
+                riemannian_grad = (G - self.V @ (G.T @ self.V))
+                self.V += lr * riemannian_grad
             elif pca_optimization == 'landing':
-                riemannian_grad = (G - V @ (G.T @ V))
-                field = V @ (V.T @ V) - V
-                V += lr * (riemannian_grad + landing_lambda * field)
+                riemannian_grad = (G - self.V @ (G.T @ self.V))
+                field = self.V @ (self.V.T @ self.V) - self.V
+                self.V += lr * (riemannian_grad + landing_lambda * field)
             if pca_optimization != 'landing':
-                V, _ = jnp.linalg.qr(V)
+                self.V, _ = jnp.linalg.qr(self.V)
             
-            self.evaluate(V=V)
-        return V
+            self.evaluate(V=self.V)
+        # return self.V
     
 
     def sample(self) -> Tuple[jnp.ndarray, jnp.ndarray]:
@@ -518,7 +569,7 @@ class StreamingFairBlockPCA:
         """
         ## Check arguments
         assert isinstance(target_dim, int) and 0 < target_dim < self.d
-        assert isinstance(rank, int) and 0 < rank <= self.d
+        assert isinstance(rank, int) and 0 <= rank <= self.d
         assert isinstance(n_iter, int) and n_iter > 0
         assert constraint in ['vanilla', 'mean', 'covariance', 'all'], constraint
         subspace_frequent_direction = False
@@ -554,9 +605,7 @@ class StreamingFairBlockPCA:
 
         ## Optimality
         self.total_var, self.V_star = self.get_ground_truth(self.k, rank, mode=None)
-        self.exp_var_gt, self.V_ground_truth = None, None
-        if constraint in ['mean', 'covariance', 'all']:
-            self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(self.k, rank, mode=constraint)
+        self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(self.k, rank, mode=constraint)
         
         ## Optimization variables
         f, W = None, None
@@ -564,8 +613,8 @@ class StreamingFairBlockPCA:
             self.key, rng = random.split(self.key)
             W, _ = jnp.linalg.qr(random.normal(rng, (self.d, rank)))
         self.key, rng = random.split(self.key)
-        V, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.k)))
-        self.evaluate(V=V, W=W)
+        self.V, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.k)))
+        self.evaluate(V=self.V, W=W)
 
         ## SUBSPACE ESTIMATION
         if constraint in ['mean', 'covariance', 'all']:
@@ -594,18 +643,18 @@ class StreamingFairBlockPCA:
                 f = (n_global_group[0] * mean_global_group[1] - n_global_group[1] * mean_global_group[0]) / (n_iter_inner * batch_size_subspace-1)
                 f /= (jnp.linalg.norm(f) + 1e-8)
                 self.evaluate(f=f)
-                N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
+                self.N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
 
             if constraint in ['covariance', 'all']:
-                N = W.copy()   # this line is used only when `constrain == 'covariance'`
+                self.N = W.copy()   # this line is used only when `constrain == 'covariance'`
                             
             if constraint == 'all':
                 ## Normal subspace; for both mean & covariance gap
                 if jnp.isclose(jnp.linalg.norm(f), 0):
-                    N = W.copy()
+                    self.N = W.copy()
                 else:
-                    N = jnp.concatenate([f.reshape(-1,1), W], 1)
-                    N, _ = jnp.linalg.qr(N)
+                    self.N = jnp.concatenate([f.reshape(-1,1), W], 1)
+                    self.N, _ = jnp.linalg.qr(self.N)
         
         ## PCA OPTIMIZATION
         n_global = 0
@@ -616,7 +665,7 @@ class StreamingFairBlockPCA:
         lr_pca0 = lr_pca
         pbar = trange(1, n_iter+1)
         for t in pbar:
-            _V = V.copy()       # store previous V
+            _V = self.V.copy()       # store previous V
             if lr_scheduler is not None and lr_pca is not None: lr_pca = lr_pca0 * lr_scheduler(t)
 
             ## Before Sampling
@@ -624,7 +673,7 @@ class StreamingFairBlockPCA:
             cov_V =  jnp.zeros((self.d,self.k))
             if constraint in ['mean', 'covariance', 'all']:
                 ## projection
-                V -= fairness_tradeoff * N @ N.T @ V
+                self.V -= fairness_tradeoff * self.N @ self.N.T @ self.V
 
             ## Sampling
             for b_local in range(batch_size_pca):
@@ -633,7 +682,7 @@ class StreamingFairBlockPCA:
                 mean_local += x
                 mean_local /= b_local+1
                 cov_V *= b_local
-                cov_V += jnp.outer(x, jnp.dot(x, V))
+                cov_V += jnp.outer(x, jnp.dot(x, self.V))
                 cov_V /= b_local+1
 
             ## After Sampling
@@ -644,42 +693,42 @@ class StreamingFairBlockPCA:
             n_global += b_local
             if constraint in ['mean', 'covariance', 'all']:
                 ## projection
-                cov_V -= fairness_tradeoff * N @ N.T @ cov_V
+                cov_V -= fairness_tradeoff * self.N @ self.N.T @ cov_V
             
             if pca_optimization == 'oja':
-                V += lr_pca * cov_V
-                V, _ = jnp.linalg.qr(V)
+                self.V += lr_pca * cov_V
+                self.V, _ = jnp.linalg.qr(self.V)
             elif pca_optimization == 'npm':
-                V = cov_V
-                V, _ = jnp.linalg.qr(V)
+                self.V = cov_V
+                self.V, _ = jnp.linalg.qr(self.V)
             elif pca_optimization == 'riemannian':
                 G = cov_V
-                riemannian_grad = (G - V @ (G.T @ V))
-                V += lr_pca * riemannian_grad
-                V, _ = jnp.linalg.qr(V)
+                riemannian_grad = (G - self.V @ (G.T @ self.V))
+                self.V += lr_pca * riemannian_grad
+                self.V, _ = jnp.linalg.qr(self.V)
             elif pca_optimization == 'landing': 
                 G = cov_V
-                riemannian_grad = (G - V @ (G.T @ V))
-                field = V @ (V.T @ V) - V
-                V += lr_pca * (riemannian_grad + landing_lambda * field)
+                riemannian_grad = (G - self.V @ (G.T @ self.V))
+                field = self.V @ (self.V.T @ self.V) - self.V
+                self.V += lr_pca * (riemannian_grad + landing_lambda * field)
             elif pca_optimization == 'history':
                 if t==1:
-                    S = V + cov_V
+                    S = self.V + cov_V
                 else:
-                    S = batch_size_pca * cov_V + (n_global - batch_size_pca) * _V @ jnp.diag(D_V) @ _V.T @ V
+                    S = batch_size_pca * cov_V + (n_global - batch_size_pca) * _V @ jnp.diag(D_V) @ _V.T @ self.V
                     S /= n_global
-                V, _ = jnp.linalg.qr(S)
+                self.V, _ = jnp.linalg.qr(S)
                 D_V = jnp.linalg.norm(S, ord=2, axis=0)
             if pca_frequent_direction:
-                B_V = B_V.at[:,-self.k:].set(V)
+                B_V = B_V.at[:,-self.k:].set(self.V)
                 U_V, S_V, _ = jnp.linalg.svd(B_V, full_matrices=False)  # singular value in decreasing order
                 min_singular = jnp.square(S_V[self.k])
                 S_V = jnp.sqrt(jnp.clip(jnp.square(S_V)-min_singular, 0, None))
                 B_V = U_V @ jnp.diag(S_V)
-                V = B_V[:,:self.k]
-                V, _ = jnp.linalg.qr(V)
+                self.V = B_V[:,:self.k]
+                self.V, _ = jnp.linalg.qr(self.V)
             
-            self.evaluate(V=V)
+            self.evaluate(V=self.V)
             if verbose:
                 desc = "" 
                 if constraint in ['mean', 'all']:
@@ -688,223 +737,67 @@ class StreamingFairBlockPCA:
                 pbar.set_description(desc)
             
 
-        return V
+        return self.V
     
 
-    def train_combined(self,
-            target_dim,
-            rank,
-            n_iter,
-            batch_size_subspace,
-            batch_size_pca,
-            constraint='all',
-            subspace_optimization='npm',
-            pca_optimization='oja',
-            lr_pca=None,
-            n_iter_inner=1,
-            landing_lambda=None,
-            seed=None,
-            tol=None,
-            lr_scheduler=None,
-            fairness_tradeoff=1.,
-        ):
-        """
-        Streaminig Fair Block PCA Algorithm.
-
-        """
-        ## Check arguments
-        assert isinstance(target_dim, int) and 0 < target_dim < self.d
-        assert isinstance(rank, int) and 0 < rank <= self.d
-        assert isinstance(n_iter, int) and n_iter > 0
-        assert constraint in ['vanilla', 'mean', 'covariance', 'all'], constraint
-        subspace_frequent_direction = False
-        if constraint != 'vanilla':
-            assert subspace_optimization in ['npm', 'npmfd', 'history', 'historyfd'], subspace_optimization
-            assert isinstance(batch_size_subspace, int) and batch_size_subspace > 0
-            if subspace_optimization[-2:] == 'fd':
-                subspace_optimization = subspace_optimization[:-2]
-                subspace_frequent_direction = True
-        pca_frequent_direction = False
-        assert pca_optimization in ['oja', 'npm', 'ojafd', 'npmfd', 'riemannian', 'landing', 'history', 'historyfd'], pca_optimization
-        assert isinstance(batch_size_pca, int) and batch_size_pca > 0
-        if pca_optimization[-2:] == 'fd':
-            pca_optimization = pca_optimization[:-2]
-            pca_frequent_direction = True
-        
-        if pca_optimization not in ['npm', 'npmfd', 'history']:
-            assert isinstance(lr_pca, (int, float)) and lr_pca > 0
-        if pca_optimization in ['landing']:
-            assert isinstance(landing_lambda, float) and landing_lambda > 0
-
-        if seed is None:
-            from sys import maxsize
-            seed = np.random.randint(0,maxsize)
-        self.key = random.PRNGKey(seed)
-        self.n_iter = n_iter
-        self.k = target_dim
-        if constraint in ['covariance', 'all']:
-            self.r = rank
-
-        ## Buffers
-        self.buffer = Buffer()
-        self.total_var, self.V_star = self.get_ground_truth(self.k, rank, mode=None)
-        self.exp_var_gt, self.V_ground_truth = None, None
-        if constraint in ['mean', 'covariance', 'all']:
-            self.exp_var_gt, self.V_ground_truth = self.get_ground_truth(self.k, rank, mode=constraint)
-        
-        f, W = None, None
-        if constraint in ['covariance', 'all']:
-            self.key, rng = random.split(self.key)
-            W, _ = jnp.linalg.qr(random.normal(rng, (self.d, rank)))
-        self.key, rng = random.split(self.key)
-        V, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.k)))
-        self.evaluate(V=V, W=W)
-
-        n_global = 0
-        mean_global = jnp.zeros(self.d)
-        if constraint in ['mean', 'covariance', 'all']:
-            n_global_group = [0 for _ in range(self.num_groups)]  # n per group
-            if constraint != 'covariance':
-                mean_global_group = [jnp.zeros(self.d) for _ in range(self.num_groups)]
-        
-        B_R, D_R = None, None
-        if subspace_frequent_direction: B_R = jnp.zeros((self.d, 2*rank))
-        if pca_frequent_direction: B_V = jnp.zeros((self.d, 2*self.k))
-        if subspace_optimization == 'history': D_R = jnp.zeros(rank)
-        if pca_optimization == 'history': D_V = jnp.zeros(self.k)
-        lr_pca0 = lr_pca
-
-        pbar = trange(1, n_iter+1)
-        for t in pbar:
-            _V = V.copy()       # store previous V
-            if lr_scheduler is not None and lr_pca is not None: lr_pca = lr_pca0 * lr_scheduler(t)
-            
-            ## SUBSPACE ESTIMATION
-            if constraint in ['mean', 'covariance', 'all']:
-                for _ in range(n_iter_inner):
-                    N, f, W, n_global_group, mean_global_group = self.subspace_estimation(
-                        W, t, self.r, batch_size_subspace, n_global_group, mean_global_group,
-                        constraint, subspace_optimization, subspace_frequent_direction, B_R, D_R
-                    )
-
-            ## PCA OPTIMIZATION
-            ## Before Sampling
-            mean_local = jnp.zeros(self.d)
-            cov_V =  jnp.zeros((self.d,self.k))
-            if constraint in ['mean', 'covariance', 'all']:
-                ## projection
-                V -= fairness_tradeoff * N @ N.T @ V
-
-            ## Sampling
-            for n_local in range(batch_size_pca):
-                _, x = self.sample()
-                mean_local *= n_local
-                mean_local += x
-                mean_local /= n_local+1
-                cov_V *= n_local
-                cov_V += jnp.outer(x, jnp.dot(x, V))
-                cov_V /= n_local+1
-                n_local += 1
-
-            ## After Sampling
-            # cov_V -= np.outer(mean_global, np.dot(mean_global, V))
-            mean_global *= n_global
-            mean_global += batch_size_pca * mean_local
-            mean_global /= n_global + batch_size_pca
-            n_global += n_local
-
-            if constraint in ['mean', 'covariance', 'all']:
-                ## projection
-                cov_V -= fairness_tradeoff * N @ N.T @ cov_V
-            
-            if pca_optimization == 'oja':
-                V += lr_pca * cov_V
-                V, _ = jnp.linalg.qr(V)
-            elif pca_optimization == 'npm':
-                V = cov_V
-                V, _ = jnp.linalg.qr(V)
-            elif pca_optimization == 'riemannian':
-                G = cov_V
-                riemannian_grad = (G - V @ (G.T @ V))
-                V += lr_pca * riemannian_grad
-                V, _ = jnp.linalg.qr(V)
-            elif pca_optimization == 'landing': 
-                G = cov_V
-                riemannian_grad = (G - V @ (G.T @ V))
-                field = V @ (V.T @ V) - V
-                V += lr_pca * (riemannian_grad + landing_lambda * field)
-            elif pca_optimization == 'history':
-                if t==1:
-                    S = V + cov_V
-                else:
-                    S = batch_size_pca * cov_V + (n_global - batch_size_pca) * _V @ jnp.diag(D_V) @ _V.T @ V
-                    S /= n_global
-                V, _ = jnp.linalg.qr(S)
-                D_V = jnp.linalg.norm(S, ord=2, axis=0)
-            if pca_frequent_direction:
-                B_V = B_V.at[:,-self.k:].set(V)
-                U_V, S_V, _ = jnp.linalg.svd(B_V, full_matrices=False)  # singular value in decreasing order
-                min_singular = jnp.square(S_V[self.k])
-                S_V = jnp.sqrt(jnp.clip(jnp.square(S_V)-min_singular, 0, None))
-                B_V = U_V @ jnp.diag(S_V)
-                V = B_V[:,:self.k]
-                V, _ = jnp.linalg.qr(V)
-            
-            self.evaluate(V=V, W=W, f=f)
-            if tol is not None:
-                # _gr = grassmanian_distance(V, _V)
-                desc = f"mu_err={jnp.linalg.norm(mean_global-self.mu):.5f} "
-                if constraint in ['mean', 'all']:
-                    desc += f"mu_gap_err={self.buffer.mu_gap_estim_err[-1]:.5f} "
-                if constraint in ['covarinace', 'all']:
-                    desc += f"W_dist={self.buffer.W_dist[-1]:.5f} "
-                pbar.set_description(desc)
-                # if _gr < tol:
-                #     print(f"OUTER: Broke in {t} / {n_iter}"); break
-        return V
-
+    # def train_kleindessner(self, )
+    
 
     def transform(self, x:jnp.ndarray, V=None) -> jnp.ndarray:
         if V is None:
             assert hasattr(self, 'V'), 'Training is NOT done'
             V = self.V
-        return jnp.dot(V, jnp.dot(V, x))
+        return jnp.dot(V, jnp.dot(V.T, x))
+    
+    def transform_low_dimension(self, x:jnp.ndarray, V=None) -> jnp.ndarray:
+        if V is None:
+            assert hasattr(self, 'V'), 'Training is NOT done'
+            V = self.V
+        return jnp.dot(V.T, x)
     
 
     def plot_buffer(self, n_iter=None, show=False, save=None, fig=None, axes=None):
         plt.close('all')
         if n_iter is None: n_iter = self.n_iter
         if fig is None or axes is None:
-            fig, axes = plt.subplots(2, 3, figsize=(9, 6))
+            fig, axes = plt.subplots(2, 4, figsize=(12, 6))
 
         ax = axes[0][0]
         ax.plot(self.buffer.explained_variance_ratio)
         if hasattr(self, 'exp_var_gt') and self.exp_var_gt is not None:
-            ax.hlines(self.exp_var_gt/self.total_var, 0, n_iter+1, colors='r', linestyles='dashed')
-        ax.hlines(self.eigval_Sigma[-self.k:].sum()/self.total_var, 0, n_iter+1, colors='b', linestyles='dashdot')
+            ax.hlines(self.exp_var_gt/self.total_var, 0, n_iter+1, colors='r', linestyle='dashed')
+        ax.hlines(self.eigval_Sigma[-self.k:].sum()/self.total_var, 0, n_iter+1, colors='b', linestyle='dashdot')
         ax.set_title('Explained Variance Ratio')
         # ax.set_ylim(top=1)
 
         ax = axes[0][1]
-        ax.plot(self.buffer.distance_from_gt)
-        ax.set_title('Grassmanian dist. to $V^{(k)}_\\ast$')
-        ax.set_ylim(bottom=-0.01)
-        if len(self.buffer.distance_from_gt) > 0:
-            ax.set_ylim(top=max(self.buffer.distance_from_gt)+.01)
-        
-        ax = axes[0][2]
-        ax.plot(self.buffer.mu_gap_estim_err)
-        ax.set_title('Estimation error: $\mu_{gap}$')
-        ax.set_ylim(bottom=-0.01)
-        if len(self.buffer.mu_gap_estim_err) > 0:
-            ax.set_ylim(top=max(self.buffer.mu_gap_estim_err)+.01)
-        
-        ax = axes[1][0]
         ax.plot(self.buffer.projected_mean_diff)
         ax.set_title('Projected mean gap\n(mean fairness)')
         ax.set_ylim(bottom=-0.01)
         # if len(self.buffer.projected_mean_diff) > 0:
         #     ax.set_ylim(top=max(self.buffer.projected_mean_diff)+.01)
+
+        ax = axes[0][2]
+        ax.plot(self.buffer.distance_from_gt)
+        ax.set_title('Grassmanian dist. to $V^{(k)}_{opt}$')
+        ax.set_ylim(bottom=-0.01)
+        if len(self.buffer.distance_from_gt) > 0:
+            ax.set_ylim(top=max(self.buffer.distance_from_gt)+.01)
+
+        ax = axes[0][3]
+        ax.plot(self.buffer.distance_from_gt)
+        ax.set_title('$sin(V, P_k)=||(I-VV^T) P_k||$')
+        ax.set_ylim(bottom=-0.01)
+        if len(self.buffer.distance_from_gt) > 0:
+            ax.set_ylim(top=max(self.buffer.distance_from_gt)+.01)
+        
+        ax = axes[1][0]
+        g = ax.plot(self.buffer.explained_variance_ratio_0, label='Group 0')
+        c = g[0].get_color()
+        ax.plot(self.buffer.explained_variance_ratio_1, label='Group 1', c=c, linestyle='--')
+        # ax.legend().set_visible(False)
+        # ax.legend()
+        ax.set_title('Group ExpVarRatio')
 
         ax = axes[1][1]
         ax.plot(self.buffer.projected_cov_diff)
