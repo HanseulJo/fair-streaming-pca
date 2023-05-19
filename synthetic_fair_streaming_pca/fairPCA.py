@@ -170,22 +170,25 @@ class StreamingFairBlockPCA:
                 key, rng = random.split(key)
                 D0 = max_cov_eig0 * (1 + 0.1 * random.normal(rng, (self._r,)))  # main
                 key, rng = random.split(key)
-                D0 = jnp.concatenate([D0, max_cov_eig0 * (jnp.arange(2,dim_gap+2) ** (-1.) + 0.1 * random.normal(rng, (dim_gap,)))])  # power law decay
-                D0 = jnp.abs(D0)
+                D0 = jnp.concatenate([D0, max_cov_eig0 * (jnp.arange(2,dim_gap+2) ** (-1.) + eps * random.normal(rng, (dim_gap,)))])  # power law decay
+                D0 = jnp.abs(D0) + eps
             if Sigma1 is None:
                 key, rng = random.split(key)
                 D1 = max_cov_eig1 * (1 + 0.1 * random.normal(rng, (self._r,)))  # main
                 key, rng = random.split(key)
-                D1 = jnp.concatenate([D1, max_cov_eig0 * (jnp.arange(2,dim_gap+2) ** (-1.) + 0.1 * random.normal(rng, (dim_gap,)))])  # power law decay
-                D1 = jnp.abs(D1)
+                D1 = jnp.concatenate([D1, max_cov_eig1 * (jnp.arange(2,dim_gap+2) ** (-1.5) + eps * random.normal(rng, (dim_gap,)))])  # power law decay
+                D1 = jnp.abs(D1) + eps
 
             ### 3. Eigen-Composition to make Sigma0 & Sigma1;
             ###     rank(Sigma1 - Sigma0) <= d - r.
             if Sigma0 is None:
                 self.Sigma0 = W0 @ jnp.diag(D0) @ W0.T
+                self.Sigma0 = jnp.round((self.Sigma0 + self.Sigma0.T)/2, 6)
             if Sigma1 is None:
                 self.Sigma1 = W1 @ jnp.diag(D1) @ W1.T
+                self.Sigma1 = jnp.round((self.Sigma1 + self.Sigma1.T)/2, 6)
         self.Sigma = (1-self.p) * self.Sigma0 + self.p * self.Sigma1 + self.p*(1-self.p) * jnp.outer(self.mu_gap, self.mu_gap)
+        self.Sigma = jnp.round((self.Sigma + self.Sigma.T)/2, 6)
         assert jnp.min(jnp.linalg.eigh(self.Sigma)[0]) >= 0, f"Invalid Sigma: non-PSD, {jnp.linalg.eigh(self.Sigma)[0]}"
         self.Sigma_gap = self.Sigma1 - self.Sigma0
         
@@ -572,6 +575,7 @@ class StreamingFairBlockPCA:
         assert isinstance(rank, int) and 0 <= rank <= self.d
         assert isinstance(n_iter, int) and n_iter > 0
         assert constraint in ['vanilla', 'mean', 'covariance', 'all'], constraint
+        if constraint == 'all' and rank == 0: constraint = 'mean'
         subspace_frequent_direction = False
         if constraint != 'vanilla':
             assert subspace_optimization in ['npm', 'npmfd', 'history', 'historyfd'], subspace_optimization
@@ -597,7 +601,7 @@ class StreamingFairBlockPCA:
         self.key = random.PRNGKey(seed)
         self.n_iter = n_iter
         self.k = target_dim
-        if constraint in ['covariance', 'all']:
+        if constraint in ['mean','covariance', 'all']:
             self.r = rank
 
         ## Buffers

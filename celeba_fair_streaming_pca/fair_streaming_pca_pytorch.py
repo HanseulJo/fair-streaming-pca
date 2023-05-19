@@ -4,6 +4,7 @@ import jax.numpy as jnp
 import torch
 from tqdm.auto import tqdm, trange
 from scipy.linalg import null_space
+from torch.utils.data import DataLoader, Subset
 
 # from kleindessner.src.fair_pca.fair_PCA import (
 #     solve_standard_eigenproblem_for_smallest_magnitude_eigenvalues,
@@ -53,13 +54,15 @@ class FairStreamingPCA:
         return self.V
 
     def fit(self, 
-            loader,
+            dataset,
+            # loader,
             target_unfair_dim,
             target_pca_dim,
             n_iter_unfair,
             n_iter_pca,
             block_size_unfair,
             block_size_pca,
+            batch_size,
             constraint='all',
             unfairness_optimization='npm',
             pca_optimization='npm',
@@ -69,11 +72,13 @@ class FairStreamingPCA:
             seed=None,
             # logger=None,
             verbose=False,
-            loader_val=None) -> None:
+            loader_val=None,
+            save_V=False) -> None:
         
         self.k = target_pca_dim
         self.m = target_unfair_dim
-        self.batch_size, self.num_channel, height, width = next(iter(loader))[0].size()
+        self.batch_size = batch_size
+        self.num_channel, height, width = dataset[0][0].size()#next(iter(loader))[0].size()
         self.d = height * width
         if seed is not None:
             torch.manual_seed(seed)
@@ -91,7 +96,9 @@ class FairStreamingPCA:
         self.verbose = verbose
 
         # Recording performances
-        self.buffer_V = []
+        self.save_V = save_V
+        if save_V:
+            self.buffer_V = []
 
         # Initialization of parameters
         self.V, _ = torch.linalg.qr(torch.normal(0, 1, size=(self.num_channel, self.d, self.k)))
@@ -102,17 +109,26 @@ class FairStreamingPCA:
         
         ## SUBSPACE ESTIMATION
         if constraint in ['mean', 'covariance', 'all']:
-            self._unfair_subspace_estimation(loader, loader_val=loader_val)
+            self._unfair_subspace_estimation(dataset,
+                                             #loader,
+                                             )
         ## PCA OPTIMIZATION
-        self._principal_component_analysis(loader)
+        self._principal_component_analysis(dataset,
+                                             #loader,
+                                             )
 
-    def _unfair_subspace_estimation(self, loader, loader_val=None) -> None:
+    def _unfair_subspace_estimation(self,
+                                    dataset,#loader
+                                    ) -> None:
         self.b_global_group = [0 for _ in range(2)]
         self.mean_global_group = [torch.zeros(self.num_channel, self.d).to(self.device) for _ in range(2)]
         self.B_W = None if not self.unfairness_frequent_direction else torch.zeros(self.num_channel, self.d, 2*self.m).to(self.device)
 
         pbar = trange(1, self.n_iter_unfair+1, desc="UnfairEstim:")
         for t in pbar:
+            print
+            subset = Subset(dataset, range((t-1)*self.block_size_unfair, t*self.block_size_unfair))
+            loader = DataLoader(dataset=subset, batch_size=self.batch_size, shuffle=False, num_workers=0, drop_last=False)
             self._unfair_subspace_estimation_with_npm(loader, t)
             if torch.isnan(self.W).any():
                 raise ValueError('nan W')
@@ -131,14 +147,6 @@ class FairStreamingPCA:
                         
         if self.constraint == 'all':
             ## Normal subspace; for both mean & covariance gap
-            # if torch.isclose(torch.norm(self.f), torch.zeros(1).to(self.device)):
-            #     self.N = self.W.clone()
-            # elif torch.isclose(torch.norm(self.W), torch.zeros(1).to(self.device)):
-            #     self.N = torch.unsqueeze(self.f, -1)
-            # else:
-            #     self.N = torch.cat([torch.unsqueeze(self.f, -1), self.W], -1)
-            #     self.N, _ = torch.linalg.qr(self.N.cpu())
-            #     self.N = self.N.to(self.device)
             f2 = self.f - torch.einsum("cdm,cm->cd", self.W, torch.einsum("cdm,cd->cm",self.W, self.f))
             f2_norm = torch.norm(f2).cpu()
             if torch.isclose(f2_norm, torch.zeros(1)):
@@ -161,7 +169,6 @@ class FairStreamingPCA:
         _n_iter = self.block_size_unfair // self.batch_size
         b_local_group = [0 for _ in range(2)]
         pbar = tqdm(enumerate(loader), total=_n_iter, disable=not self.verbose, desc=f'UnfairEstim({t}/{self.n_iter_unfair}):')
-        # pbar = enumerate(loader)
         for batch_index, (img, label) in pbar:
             if batch_index >= _n_iter: break
             img, label = img.to(self.device), label.to(self.device)
@@ -172,13 +179,14 @@ class FairStreamingPCA:
                     mean_local_group[s] += x[ss==s].sum(0) / self.block_size_unfair
                 if self.constraint in ['covariance', 'all']:
                     cov_W_group[s] += torch.einsum("bcd,bcm->cdm", x[ss==s], torch.einsum("bcd,cdm->bcm", x[ss==s], self.W)) / self.block_size_unfair
-                b_local_group[s] += (ss==s).sum()
+                b_local_group[s] += (ss==s).sum().item()
         
         for s in range(2):
             if self.constraint in ['mean', 'all']:
                 self.mean_global_group[s] *= self.b_global_group[s]
                 self.mean_global_group[s] += b_local_group[s] * mean_local_group[s]
-                self.mean_global_group[s] /= self.b_global_group[s] + b_local_group[s]
+                if self.b_global_group[s] + b_local_group[s] > 0:
+                    self.mean_global_group[s] /= self.b_global_group[s] + b_local_group[s]
             self.b_global_group[s] += b_local_group[s]
             
 
@@ -200,13 +208,17 @@ class FairStreamingPCA:
                 self.W = self.W.to(self.device)
             
 
-    def _principal_component_analysis(self, loader) -> None:
+    def _principal_component_analysis(self, 
+                                      dataset,
+                                      #loader
+                                      ) -> None:
         b_global = 0
         mean_global = torch.zeros(self.num_channel, self.d).to(self.device)
         self.B_V = None
         if self.pca_frequent_direction: self.B_V = torch.zeros(self.num_channel, self.d, 2*self.k).to(self.device)
         
-        self.buffer_V.append(self.V.clone())
+        if self.save_V:
+            self.buffer_V.append(self.V.clone().cpu())
 
         for t in trange(1, self.n_iter_pca+1,  desc=f'PCA:'):
             ## Before Sampling
@@ -220,7 +232,9 @@ class FairStreamingPCA:
             ## Sampling
             _n_iter = self.block_size_pca // self.batch_size
             b_local = 0
-            # pbar = tqdm(enumerate(loader), total=_n_iter)
+            # print((t-1)*self.block_size_pca, t*self.block_size_pca)            
+            subset = Subset(dataset, range((t-1)*self.block_size_pca, t*self.block_size_pca))
+            loader = DataLoader(dataset=subset, batch_size=self.batch_size, shuffle=False, num_workers=0, drop_last=False)
             pbar = tqdm(enumerate(loader), total=_n_iter, disable=not self.verbose, desc=f'PCA({t}/{self.n_iter_pca}):')
             for batch_index, (img, _) in pbar:
                 img = img.to(self.device)
@@ -252,8 +266,8 @@ class FairStreamingPCA:
                 self.V, _ = torch.linalg.qr(self.B_V[...,:self.k].cpu())
                 self.V = self.V.to(self.device)
             
-            if t % 1 == 0:
-                self.buffer_V.append(self.V.clone())
+            if t % max(1,self.n_iter_pca // 10) == 0 and self.save_V:
+                self.buffer_V.append(self.V.clone().cpu())
             
 
     def transform(self, x=None, loader=None, lambda_transform=lambda t: t):
@@ -261,6 +275,7 @@ class FairStreamingPCA:
         assert (x is None and loader is not None) or (x is not None and loader is None)
         if x is not None:
             x = x.to(self.device)
+            self.V = self.V.to(self.device)
             if x.ndim == 3:
                 x = torch.unsqueeze(x,0)
             bs, num_ch, h, w = x.size()
