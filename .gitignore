@@ -2,7 +2,7 @@
 */*.pdf
 .DS_Store
 __pycache__/
-*/datasets/
+celeba_fair_streaming_pca/datasets/
 .idea
 */__pycache__/
 */*/__pycache__/
