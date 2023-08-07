@@ -11,9 +11,16 @@ from tqdm.auto import trange
 
 def sin(A:jnp.ndarray, B:jnp.ndarray):
     assert A.shape == B.shape
-    denom = jnp.sqrt(jnp.square(A).sum() * jnp.square(B).sum())
-    cos = jnp.sum(A*B) / (denom + 1e-8)
-    return jnp.sqrt(1-jnp.square(cos))
+    if jnp.isnan(A).any():
+        raise ValueError(f'NaN A: {A}')
+    if jnp.isnan(B).any():
+        raise ValueError(f'NaN B: {B}')
+    denom = jnp.square(A).sum() * jnp.square(B).sum()
+    cos2 = jnp.square(jnp.sum(A*B)) / (denom + 1e-6)
+    out = jnp.sqrt(1-cos2)
+    if out != out:
+        raise ValueError(f'NaN sin: denom={denom} cos^2={cos2} out={out}')
+    return out
 
 
 def sin_v2(A:jnp.ndarray, B:jnp.ndarray):
@@ -111,7 +118,7 @@ class StreamingFairBlockPCA:
         else: #  isinstance(probability, Iterable):
             raise NotImplementedError
         if rank is not None:
-            assert isinstance(rank, int) and 0 <= rank <= data_dim, f"Invalid rank: {rank}"
+            assert isinstance(rank, int) and 0 <= rank < data_dim, f"Invalid rank: {rank}"
 
         self.d = data_dim
         self.num_attr = num_attributes
@@ -149,44 +156,58 @@ class StreamingFairBlockPCA:
         self.Sigma0 = Sigma0
         self.Sigma1 = Sigma1
         if Sigma0 is None or Sigma1 is None:
-            ### 1. Orthogonal matrices W0 & W1 (sharing r same columns)
-            dim_gap_ = self.d-(self._r//2)
+            r0 = self._r // 2
+            r1 = self._r - r0
             key, rng = random.split(key)
-            A_ = random.normal(rng, (self.d, self._r//2))
+            O, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.d)))  # random orthogonal
+            D = random.uniform(rng, (self.d-r0-r1,), minval=0, maxval=min(max_cov_eig0, max_cov_eig1))
             if Sigma0 is None:
-                key, rng = random.split(key)
-                A0 = random.normal(rng, (self.d, dim_gap_))
-                A0 = jnp.concatenate([A_, A0], 1)
-                W0, _ = jnp.linalg.qr(A0)   # orthogonal
+                W0 = jnp.concatenate([O[:, r0+r1:], O[:, :r0]], 1)
+                D0 = jnp.concatenate([D, random.uniform(rng, (r0,), minval=min(max_cov_eig0, max_cov_eig1)/2, maxval=max_cov_eig0)])
+                self.Sigma0 = jnp.round(W0 @ jnp.diag(D0) @ W0.T + eps/2 * jnp.eye(self.d), 6)
             if Sigma1 is None:
-                key, rng = random.split(key)
-                A1 = random.normal(rng, (self.d, dim_gap_))
-                A1 = jnp.concatenate([A_, A1], 1)
-                W1, _ = jnp.linalg.qr(A1)   # orthogonal
-            
-            ### 2. Eigenvalues D0 & D1 (sharing r same eigenvalues)
-            dim_gap = self.d-self._r
-            if Sigma0 is None:
-                key, rng = random.split(key)
-                D0 = max_cov_eig0 * (1 + 0.1 * random.normal(rng, (self._r,)))  # main
-                key, rng = random.split(key)
-                D0 = jnp.concatenate([D0, max_cov_eig0 * (jnp.arange(2,dim_gap+2) ** (-1.) + eps * random.normal(rng, (dim_gap,)))])  # power law decay
-                D0 = jnp.abs(D0) + eps
-            if Sigma1 is None:
-                key, rng = random.split(key)
-                D1 = max_cov_eig1 * (1 + 0.1 * random.normal(rng, (self._r,)))  # main
-                key, rng = random.split(key)
-                D1 = jnp.concatenate([D1, max_cov_eig1 * (jnp.arange(2,dim_gap+2) ** (-1.5) + eps * random.normal(rng, (dim_gap,)))])  # power law decay
-                D1 = jnp.abs(D1) + eps
+                W1 = jnp.concatenate([O[:, r0+r1:], O[:, r0:r0+r1]], 1)
+                D1 = jnp.concatenate([D, random.uniform(rng, (r1,), minval=min(max_cov_eig0, max_cov_eig1)/2, maxval=max_cov_eig1)])
+                self.Sigma1 = jnp.round(W1 @ jnp.diag(D1) @ W1.T + eps/2 * jnp.eye(self.d), 6)
 
-            ### 3. Eigen-Composition to make Sigma0 & Sigma1;
-            ###     rank(Sigma1 - Sigma0) <= d - r.
-            if Sigma0 is None:
-                self.Sigma0 = W0 @ jnp.diag(D0) @ W0.T
-                self.Sigma0 = jnp.round((self.Sigma0 + self.Sigma0.T)/2, 6)
-            if Sigma1 is None:
-                self.Sigma1 = W1 @ jnp.diag(D1) @ W1.T
-                self.Sigma1 = jnp.round((self.Sigma1 + self.Sigma1.T)/2, 6)
+
+
+            ### 1. Orthogonal matrices W0 & W1 (sharing r same columns)
+            # dim_gap_ = self.d-(self._r)
+            # key, rng = random.split(key)
+            # A_ = random.normal(rng, (self.d, self._r))
+            # if Sigma0 is None:
+            #     key, rng = random.split(key)
+            #     A0 = random.normal(rng, (self.d, dim_gap_))
+            #     A0 = jnp.concatenate([A_, A0], 1)
+            #     W0, _ = jnp.linalg.qr(A0)   # orthogonal
+            # if Sigma1 is None:
+            #     key, rng = random.split(key)
+            #     A1 = random.normal(rng, (self.d, dim_gap_))
+            #     A1 = jnp.concatenate([A_, A1], 1)
+            #     W1, _ = jnp.linalg.qr(A1)   # orthogonal
+            
+            # ### 2. Eigenvalues D0 & D1 (sharing r same eigenvalues)
+            # dim_gap = self.d-self._r
+            # if Sigma0 is None:
+            #     key, rng = random.split(key)
+            #     D0 = max_cov_eig0 * jnp.ones(self._r)  # main
+            #     key, rng = random.split(key)
+            #     D0 = jnp.concatenate([D0, jnp.zeros(dim_gap)]) + random.uniform(rng, (self.d,), minval=0, maxval=0.1)
+            # if Sigma1 is None:
+            #     key, rng = random.split(key)
+            #     D1 = max_cov_eig1 * jnp.ones(self._r)  # main
+            #     key, rng = random.split(key)
+            #     D1 = jnp.concatenate([D1, jnp.zeros(dim_gap)]) + random.uniform(rng, (self.d,), minval=0, maxval=0.1)
+
+            # ### 3. Eigen-Composition to make Sigma0 & Sigma1;
+            # ###     rank(Sigma1 - Sigma0) <= d - r.
+            # if Sigma0 is None:
+            #     self.Sigma0 = W0 @ jnp.diag(D0) @ W0.T + eps * jnp.eye(self.d)
+            #     self.Sigma0 = jnp.round((self.Sigma0 + self.Sigma0.T)/2, 6)
+            # if Sigma1 is None:
+            #     self.Sigma1 = W1 @ jnp.diag(D1) @ W1.T + eps * jnp.eye(self.d)
+            #     self.Sigma1 = jnp.round((self.Sigma1 + self.Sigma1.T)/2, 6)
         self.Sigma = (1-self.p) * self.Sigma0 + self.p * self.Sigma1 + self.p*(1-self.p) * jnp.outer(self.mu_gap, self.mu_gap)
         self.Sigma = jnp.round((self.Sigma + self.Sigma.T)/2, 6)
         assert jnp.min(jnp.linalg.eigh(self.Sigma)[0]) >= 0, f"Invalid Sigma: non-PSD, {jnp.linalg.eigh(self.Sigma)[0]}"
@@ -233,29 +254,29 @@ class StreamingFairBlockPCA:
             norm_f = jnp.linalg.norm(f)
             if not jnp.isclose(norm_f, 0):
                 f /= norm_f
+                self.true_N = f.reshape(-1, 1)
                 Proj = jnp.eye(self.d) - f.reshape(-1,1) @ f.reshape(1,-1)           
         elif mode == 'covariance':
+            self.true_N = self.eigvec_Q_hat[:,-rank:]
             P = self.eigvec_Q_hat[:,:self.d-rank]
-            # P = self.eigvec_Sigma_gap_sq[:,:self.d-rank]  # wrong
             Proj = P @ P.T
         elif mode == 'all': 
-            M = self.eigvec_Q_hat[:,-rank:]
+            N = self.eigvec_Q_hat[:,-rank:]
             P = self.eigvec_Q_hat[:,:self.d-rank]
-            # M = self.eigvec_Sigma_gap_sq[:,-rank:]  # wrong
-            # P = self.eigvec_Sigma_gap_sq[:,:self.d-rank]  # wrong
             f_tilde = P @ P.T @ f.reshape(-1,1)
             norm_f_tilde = jnp.linalg.norm(f_tilde)
             if not jnp.isclose(norm_f_tilde, 0):
                 f_tilde /= norm_f_tilde
-                N = jnp.concatenate([M, f_tilde], 1)
+                N = jnp.concatenate([N, f_tilde], 1)
                 Proj = jnp.eye(self.d) - N @ N.T
             else:
                 print('f is in span(N)')
                 Proj = P @ P.T
+            self.true_N = N        
 
         if Proj is None:
             return self.eigval_Sigma[-target_dim:].sum(), self.eigvec_Sigma[:,-target_dim:]
-        
+
         M = Proj.T @ self.Sigma @ Proj
         eigval, eigvec = jnp.linalg.eigh(M)
         # print(eigval)
@@ -350,14 +371,17 @@ class StreamingFairBlockPCA:
             lr_scheduler=None,
             landing_lambda = .1,
             fairness_tradeoff=1.,
+            verbose=False,
         ):
         """
         train V in offline manner with fairness constraint
         """
         ## Check arguments
-        assert isinstance(target_dim, int) and target_dim < self.d
+        assert isinstance(target_dim, int) and 0 < target_dim < self.d
+        assert isinstance(rank, int) and 0 <= rank <= self.d
         assert isinstance(n_iter, int) and n_iter > 0
-        assert isinstance(lr, (int, float)) and lr > 0
+        assert constraint in ['vanilla', 'mean', 'covariance', 'all'], constraint
+        if constraint == 'all' and rank == 0: constraint = 'mean'
         if constraint != 'vanilla':
             assert subspace_optimization in ['pm']
             assert isinstance(n_iter_inner, int) and n_iter_inner > 0
@@ -397,7 +421,7 @@ class StreamingFairBlockPCA:
 
         # 1st phase (1) : covariance gap estimation
         if constraint in ['covariance', 'all']:
-            for _ in trange(1, n_iter_inner+1):
+            for _ in trange(1, n_iter_inner+1, disable=not verbose):
                 G = self.Q_hat @ W
                 # G = self.Sigma_gap @ W
                 if subspace_optimization == 'pm': W = G
@@ -426,7 +450,7 @@ class StreamingFairBlockPCA:
         # raise Exception
 
         lr0 = lr
-        pbar = trange(1, n_iter+1)
+        pbar = trange(1, n_iter+1, disable=not verbose)
         for t in pbar:
             if lr_scheduler is not None:
                 lr = lr0 * lr_scheduler(t)
@@ -565,6 +589,8 @@ class StreamingFairBlockPCA:
             verbose=True,
             lr_scheduler=None,
             fairness_tradeoff=1.,
+            use_true_N=False,
+            use_opt_V=False
         ):
         """
         Streaminig Fair Block PCA Algorithm.
@@ -621,124 +647,134 @@ class StreamingFairBlockPCA:
         self.evaluate(V=self.V, W=W)
 
         ## SUBSPACE ESTIMATION
-        if constraint in ['mean', 'covariance', 'all']:
-            n_global_group = [0 for _ in range(self.num_groups)]  # n per group
-            mean_global_group = [jnp.zeros(self.d) for _ in range(self.num_groups)]
-            B_Q, D_Q = None, None
-            if subspace_frequent_direction: B_Q = jnp.zeros((self.d, 2*rank))
-            if subspace_optimization == 'history': D_Q = jnp.zeros(rank)
+        if use_true_N:
+            self.N = self.true_N
+        else:
+            if constraint in ['mean', 'covariance', 'all']:
+                n_global_group = [0 for _ in range(self.num_groups)]  # n per group
+                mean_global_group = [jnp.zeros(self.d) for _ in range(self.num_groups)]
+                B_Q, D_Q = None, None
+                if subspace_frequent_direction: B_Q = jnp.zeros((self.d, 2*rank))
+                if subspace_optimization == 'history': D_Q = jnp.zeros(rank)
 
-            pbar = trange(1, n_iter_inner+1)
-            for t in pbar:
-                W, n_global_group, mean_global_group = self.subspace_estimation(
-                    W, t, self.r, batch_size_subspace, n_global_group, mean_global_group,
-                    constraint, subspace_optimization, subspace_frequent_direction, B_Q, D_Q
-                )
-                self.evaluate(W=W)
-                if verbose:
-                    desc = ""
-                    if constraint in ['covarinace', 'all']:
-                        desc += f"W_dist={self.buffer.W_dist[-1]:.5f} "
-                    pbar.set_description(desc)
+                pbar = trange(1, n_iter_inner+1, disable=not verbose)
+                for t in pbar:
+                    W, n_global_group, mean_global_group = self.subspace_estimation(
+                        W, t, self.r, batch_size_subspace, n_global_group, mean_global_group,
+                        constraint, subspace_optimization, subspace_frequent_direction, B_Q, D_Q
+                    )
+                    self.evaluate(W=W)
+                    if verbose:
+                        desc = ""
+                        if constraint in ['covarinace', 'all']:
+                            desc += f"W_dist={self.buffer.W_dist[-1]:.5f} "
+                        pbar.set_description(desc)
 
-            if constraint in ['mean', 'all']:
-                ## Mean gap
-                assert n_iter_inner * batch_size_subspace == sum(n_global_group), (n_iter_inner * batch_size_subspace, sum(n_global_group))
-                f = (n_global_group[0] * mean_global_group[1] - n_global_group[1] * mean_global_group[0]) / (n_iter_inner * batch_size_subspace-1)
-                f /= (jnp.linalg.norm(f) + 1e-8)
-                self.evaluate(f=f)
-                self.N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
+                if constraint in ['mean', 'all']:
+                    ## Mean gap
+                    assert n_iter_inner * batch_size_subspace == sum(n_global_group), (n_iter_inner * batch_size_subspace, sum(n_global_group))
+                    f = (n_global_group[0] * mean_global_group[1] - n_global_group[1] * mean_global_group[0]) / (n_iter_inner * batch_size_subspace-1)
+                    
+                    self.evaluate(f=f)
+                    f /= (jnp.linalg.norm(f) + 1e-8)
+                    self.N = f.reshape(-1, 1)   # this line is used only when `constrain == 'mean'`
 
-            if constraint in ['covariance', 'all']:
-                self.N = W.copy()   # this line is used only when `constrain == 'covariance'`
-                            
-            if constraint == 'all':
-                ## Normal subspace; for both mean & covariance gap
-                if jnp.isclose(jnp.linalg.norm(f), 0):
-                    self.N = W.copy()
-                else:
-                    self.N = jnp.concatenate([f.reshape(-1,1), W], 1)
-                    self.N, _ = jnp.linalg.qr(self.N)
+                if constraint in ['covariance', 'all']:
+                    self.N = W.copy()   # this line is used only when `constrain == 'covariance'`
+                                
+                if constraint == 'all':
+                    ## Normal subspace; for both mean & covariance gap
+                    if jnp.isclose(jnp.linalg.norm(f), 0):
+                        self.N = W.copy()
+                    else:
+                        self.N = jnp.concatenate([f.reshape(-1,1), W], 1)
+                        self.N, _ = jnp.linalg.qr(self.N)
         
         ## PCA OPTIMIZATION
-        n_global = 0
-        mean_global = jnp.zeros(self.d)
-        B_V, D_V = None, None
-        if pca_frequent_direction: B_V = jnp.zeros((self.d, 2*self.k))
-        if pca_optimization == 'history': D_V = jnp.zeros(self.k)
-        lr_pca0 = lr_pca
-        pbar = trange(1, n_iter+1)
-        for t in pbar:
-            _V = self.V.copy()       # store previous V
-            if lr_scheduler is not None and lr_pca is not None: lr_pca = lr_pca0 * lr_scheduler(t)
-
-            ## Before Sampling
-            mean_local = jnp.zeros(self.d)
-            cov_V =  jnp.zeros((self.d,self.k))
-            if constraint in ['mean', 'covariance', 'all']:
-                ## projection
-                self.V -= fairness_tradeoff * self.N @ self.N.T @ self.V
-
-            ## Sampling
-            for b_local in range(batch_size_pca):
-                _, x = self.sample()
-                mean_local *= b_local
-                mean_local += x
-                mean_local /= b_local+1
-                cov_V *= b_local
-                cov_V += jnp.outer(x, jnp.dot(x, self.V))
-                cov_V /= b_local+1
-
-            ## After Sampling
-            # cov_V -= np.outer(mean_global, np.dot(mean_global, V))
-            mean_global *= n_global
-            mean_global += batch_size_pca * mean_local
-            mean_global /= n_global + b_local
-            n_global += b_local
-            if constraint in ['mean', 'covariance', 'all']:
-                ## projection
-                cov_V -= fairness_tradeoff * self.N @ self.N.T @ cov_V
-            
-            if pca_optimization == 'oja':
-                self.V += lr_pca * cov_V
-                self.V, _ = jnp.linalg.qr(self.V)
-            elif pca_optimization == 'npm':
-                self.V = cov_V
-                self.V, _ = jnp.linalg.qr(self.V)
-            elif pca_optimization == 'riemannian':
-                G = cov_V
-                riemannian_grad = (G - self.V @ (G.T @ self.V))
-                self.V += lr_pca * riemannian_grad
-                self.V, _ = jnp.linalg.qr(self.V)
-            elif pca_optimization == 'landing': 
-                G = cov_V
-                riemannian_grad = (G - self.V @ (G.T @ self.V))
-                field = self.V @ (self.V.T @ self.V) - self.V
-                self.V += lr_pca * (riemannian_grad + landing_lambda * field)
-            elif pca_optimization == 'history':
-                if t==1:
-                    S = self.V + cov_V
-                else:
-                    S = batch_size_pca * cov_V + (n_global - batch_size_pca) * _V @ jnp.diag(D_V) @ _V.T @ self.V
-                    S /= n_global
-                self.V, _ = jnp.linalg.qr(S)
-                D_V = jnp.linalg.norm(S, ord=2, axis=0)
-            if pca_frequent_direction:
-                B_V = B_V.at[:,-self.k:].set(self.V)
-                U_V, S_V, _ = jnp.linalg.svd(B_V, full_matrices=False)  # singular value in decreasing order
-                min_singular = jnp.square(S_V[self.k])
-                S_V = jnp.sqrt(jnp.clip(jnp.square(S_V)-min_singular, 0, None))
-                B_V = U_V @ jnp.diag(S_V)
-                self.V = B_V[:,:self.k]
-                self.V, _ = jnp.linalg.qr(self.V)
-            
+        if use_opt_V:
+            Sig = (jnp.eye(self.d) - self.N @ self.N.T) @ self.Sigma @ (jnp.eye(self.d) - self.N @ self.N.T)
+            _eigval, _eigvec = jnp.linalg.eigh(Sig)
+            self.V = _eigvec[:, -self.k:]
             self.evaluate(V=self.V)
-            if verbose:
-                desc = "" 
-                if constraint in ['mean', 'all']:
-                    desc += f"mu_gap_err={self.buffer.mu_gap_estim_err[-1]:.5f} "
-                desc += f"mu_err={jnp.linalg.norm(mean_global-self.mu):.5f} "
-                pbar.set_description(desc)
+        else:
+            n_global = 0
+            mean_global = jnp.zeros(self.d)
+            B_V, D_V = None, None
+            if pca_frequent_direction: B_V = jnp.zeros((self.d, 2*self.k))
+            if pca_optimization == 'history': D_V = jnp.zeros(self.k)
+            lr_pca0 = lr_pca
+            pbar = trange(1, n_iter+1, disable=not verbose)
+            for t in pbar:
+                _V = self.V.copy()       # store previous V
+                if lr_scheduler is not None and lr_pca is not None: lr_pca = lr_pca0 * lr_scheduler(t)
+
+                ## Before Sampling
+                mean_local = jnp.zeros(self.d)
+                cov_V =  jnp.zeros((self.d,self.k))
+                if constraint in ['mean', 'covariance', 'all']:
+                    ## projection
+                    self.V -= fairness_tradeoff * self.N @ self.N.T @ self.V
+
+                ## Sampling
+                for b_local in range(batch_size_pca):
+                    _, x = self.sample()
+                    mean_local *= b_local
+                    mean_local += x
+                    mean_local /= b_local+1
+                    cov_V *= b_local
+                    cov_V += jnp.outer(x, jnp.dot(x, self.V))
+                    cov_V /= b_local+1
+
+                ## After Sampling
+                # cov_V -= np.outer(mean_global, np.dot(mean_global, V))
+                mean_global *= n_global
+                mean_global += batch_size_pca * mean_local
+                mean_global /= n_global + b_local
+                n_global += b_local
+                if constraint in ['mean', 'covariance', 'all']:
+                    ## projection
+                    cov_V -= fairness_tradeoff * self.N @ self.N.T @ cov_V
+                
+                if pca_optimization == 'oja':
+                    self.V += lr_pca * cov_V
+                    self.V, _ = jnp.linalg.qr(self.V)
+                elif pca_optimization == 'npm':
+                    self.V = cov_V
+                    self.V, _ = jnp.linalg.qr(self.V)
+                elif pca_optimization == 'riemannian':
+                    G = cov_V
+                    riemannian_grad = (G - self.V @ (G.T @ self.V))
+                    self.V += lr_pca * riemannian_grad
+                    self.V, _ = jnp.linalg.qr(self.V)
+                elif pca_optimization == 'landing': 
+                    G = cov_V
+                    riemannian_grad = (G - self.V @ (G.T @ self.V))
+                    field = self.V @ (self.V.T @ self.V) - self.V
+                    self.V += lr_pca * (riemannian_grad + landing_lambda * field)
+                elif pca_optimization == 'history':
+                    if t==1:
+                        S = self.V + cov_V
+                    else:
+                        S = batch_size_pca * cov_V + (n_global - batch_size_pca) * _V @ jnp.diag(D_V) @ _V.T @ self.V
+                        S /= n_global
+                    self.V, _ = jnp.linalg.qr(S)
+                    D_V = jnp.linalg.norm(S, ord=2, axis=0)
+                if pca_frequent_direction:
+                    B_V = B_V.at[:,-self.k:].set(self.V)
+                    U_V, S_V, _ = jnp.linalg.svd(B_V, full_matrices=False)  # singular value in decreasing order
+                    min_singular = jnp.square(S_V[self.k])
+                    S_V = jnp.sqrt(jnp.clip(jnp.square(S_V)-min_singular, 0, None))
+                    B_V = U_V @ jnp.diag(S_V)
+                    self.V = B_V[:,:self.k]
+                    self.V, _ = jnp.linalg.qr(self.V)
+                
+                self.evaluate(V=self.V)
+                if verbose:
+                    desc = "" 
+                    if not use_true_N and constraint in ['mean', 'all']:
+                        desc += f"mu_gap_err={self.buffer.mu_gap_estim_err[-1]:.5f} "
+                    desc += f"mu_err={jnp.linalg.norm(mean_global-self.mu):.5f} "
+                    pbar.set_description(desc)
             
 
         return self.V

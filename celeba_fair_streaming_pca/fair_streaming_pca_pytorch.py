@@ -1,6 +1,5 @@
 
 import numpy as np
-import jax.numpy as jnp
 import torch
 from tqdm.auto import tqdm, trange
 from scipy.linalg import null_space
@@ -70,15 +69,13 @@ class FairStreamingPCA:
             pca_frequent_direction=False,
             fairness_tradeoff=1.,
             seed=None,
-            # logger=None,
             verbose=False,
-            loader_val=None,
             save_V=False) -> None:
         
         self.k = target_pca_dim
         self.m = target_unfair_dim
         self.batch_size = batch_size
-        self.num_channel, height, width = dataset[0][0].size()#next(iter(loader))[0].size()
+        self.num_channel, height, width = dataset[0][0].size()
         self.d = height * width
         if seed is not None:
             torch.manual_seed(seed)
@@ -110,15 +107,13 @@ class FairStreamingPCA:
         ## SUBSPACE ESTIMATION
         if constraint in ['mean', 'covariance', 'all']:
             self._unfair_subspace_estimation(dataset,
-                                             #loader,
                                              )
         ## PCA OPTIMIZATION
         self._principal_component_analysis(dataset,
-                                             #loader,
                                              )
 
     def _unfair_subspace_estimation(self,
-                                    dataset,#loader
+                                    dataset,
                                     ) -> None:
         self.b_global_group = [0 for _ in range(2)]
         self.mean_global_group = [torch.zeros(self.num_channel, self.d).to(self.device) for _ in range(2)]
@@ -126,7 +121,6 @@ class FairStreamingPCA:
 
         pbar = trange(1, self.n_iter_unfair+1, desc="UnfairEstim:")
         for t in pbar:
-            print
             subset = Subset(dataset, range((t-1)*self.block_size_unfair, t*self.block_size_unfair))
             loader = DataLoader(dataset=subset, batch_size=self.batch_size, shuffle=False, num_workers=0, drop_last=False)
             self._unfair_subspace_estimation_with_npm(loader, t)
@@ -210,7 +204,6 @@ class FairStreamingPCA:
 
     def _principal_component_analysis(self, 
                                       dataset,
-                                      #loader
                                       ) -> None:
         b_global = 0
         mean_global = torch.zeros(self.num_channel, self.d).to(self.device)
@@ -284,7 +277,6 @@ class FairStreamingPCA:
             result = proj_arr.view(bs, num_ch, h, w)
             return lambda_transform(result)
         elif loader is not None:
-            # batch_size, num_channel, height, width = next(iter(loader))[0].size()
             b = 0
             b_group = [0 for _ in range(2)]
             self.explained_variance_ratio = 0

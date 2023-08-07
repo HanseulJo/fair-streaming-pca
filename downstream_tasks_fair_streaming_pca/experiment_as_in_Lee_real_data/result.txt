@@ -1,0 +1,2924 @@
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+Dataset = COMPAS
+-----------------------------------------------------------------------------------
+Embedding dim = 2
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 39.28 (4.91)
+MMD = 0.09 (0.01)
+Acc - kernel SVM = 64.53 (1.38)
+DP - kernel SVM = 0.29 (0.08)
+Acc - linear SVM = 56.67 (1.53)
+DP - linear SVM = 0.2 (0.09)
+Acc - MLP = 60.82 (2.65)
+DP - MLP = 0.3 (0.06)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 35.06 (4.9)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 61.65 (1.11)
+DP - kernel SVM = 0.1 (0.06)
+Acc - linear SVM = 56.25 (1.2)
+DP - linear SVM = 0.04 (0.03)
+Acc - MLP = 57.61 (1.67)
+DP - MLP = 0.08 (0.04)
+*******************************************************************************
+Method = FPCA-0
+Variance = 34.43 (4.76)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 60.86 (1.03)
+DP - kernel SVM = 0.11 (0.06)
+Acc - linear SVM = 55.9 (1.26)
+DP - linear SVM = 0.03 (0.03)
+Acc - MLP = 56.9 (1.88)
+DP - MLP = 0.09 (0.03)
+*******************************************************************************
+Method = MBFPCA-3
+Variance = 33.95 (4.75)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 65.36 (1.08)
+DP - kernel SVM = 0.12 (0.06)
+Acc - linear SVM = 58.39 (1.4)
+DP - linear SVM = 0.08 (0.05)
+Acc - MLP = 60.88 (1.57)
+DP - MLP = 0.1 (0.04)
+*******************************************************************************
+Method = MBFPCA-6
+Variance = 11.83 (3.4)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 57.73 (1.42)
+DP - kernel SVM = 0.06 (0.07)
+Acc - linear SVM = 56.02 (1.98)
+DP - linear SVM = 0.02 (0.03)
+Acc - MLP = 56.55 (1.56)
+DP - MLP = 0.06 (0.08)
+*******************************************************************************
+Method = INLP
+Variance = 0.36 (1.08)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 54.52 (0.7)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 54.52 (0.7)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 54.62 (0.77)
+DP - MLP = 0.0 (0.01)
+*******************************************************************************
+Method = RLACE
+Variance = 17.08 (2.6)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 62.71 (1.99)
+DP - kernel SVM = 0.09 (0.05)
+Acc - linear SVM = 56.37 (2.18)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 60.09 (2.69)
+DP - MLP = 0.07 (0.05)
+*******************************************************************************
+Method = Fair PCA
+Variance = 35.56 (4.52)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 62.82 (0.88)
+DP - kernel SVM = 0.11 (0.08)
+Acc - linear SVM = 54.55 (0.76)
+DP - linear SVM = 0.03 (0.04)
+Acc - MLP = 60.65 (2.29)
+DP - MLP = 0.13 (0.11)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 57.8 (1.82)
+DP - kernel SVM = 0.08 (0.06)
+Acc - linear SVM = 54.74 (1.21)
+DP - linear SVM = 0.02 (0.04)
+Acc - MLP = 57.72 (1.66)
+DP - MLP = 0.06 (0.06)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 25.11 (5.14)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 64.1 (1.49)
+DP - kernel SVM = 0.15 (0.06)
+Acc - linear SVM = 58.08 (2.92)
+DP - linear SVM = 0.07 (0.05)
+Acc - MLP = 62.63 (1.74)
+DP - MLP = 0.14 (0.07)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 35.42 (4.49)
+MMD = 0.03 (0.01)
+Acc - kernel SVM = 60.93 (0.6)
+DP - kernel SVM = 0.14 (0.04)
+Acc - linear SVM = 55.43 (0.94)
+DP - linear SVM = 0.06 (0.08)
+Acc - MLP = 57.03 (1.58)
+DP - MLP = 0.14 (0.1)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 63.89 (1.86)
+DP - kernel SVM = 0.2 (0.05)
+Acc - linear SVM = 57.94 (2.22)
+DP - linear SVM = 0.12 (0.05)
+Acc - MLP = 63.95 (3.98)
+DP - MLP = 0.18 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 35.56 (4.52)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 62.82 (0.88)
+DP - kernel SVM = 0.11 (0.08)
+Acc - linear SVM = 54.55 (0.76)
+DP - linear SVM = 0.03 (0.04)
+Acc - MLP = 59.74 (1.72)
+DP - MLP = 0.12 (0.09)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 34.13 (5.35)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 60.86 (1.07)
+DP - kernel SVM = 0.14 (0.06)
+Acc - linear SVM = 55.41 (0.81)
+DP - linear SVM = 0.04 (0.06)
+Acc - MLP = 57.64 (1.26)
+DP - MLP = 0.15 (0.11)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 25.06 (5.13)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 64.14 (1.5)
+DP - kernel SVM = 0.15 (0.06)
+Acc - linear SVM = 58.23 (3.04)
+DP - linear SVM = 0.07 (0.06)
+Acc - MLP = 62.42 (2.21)
+DP - MLP = 0.14 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 13.24 (5.03)
+MMD = 0.03 (0.02)
+Acc - kernel SVM = 61.66 (2.3)
+DP - kernel SVM = 0.15 (0.08)
+Acc - linear SVM = 57.3 (2.45)
+DP - linear SVM = 0.05 (0.05)
+Acc - MLP = 61.05 (3.43)
+DP - MLP = 0.12 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 18.57 (2.78)
+MMD = 0.22 (0.11)
+Acc - kernel SVM = 62.42 (2.4)
+DP - kernel SVM = 0.39 (0.19)
+Acc - linear SVM = 59.19 (3.26)
+DP - linear SVM = 0.42 (0.35)
+Acc - MLP = 61.3 (2.77)
+DP - MLP = 0.43 (0.21)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 18.57 (2.78)
+MMD = 0.47 (0.27)
+Acc - kernel SVM = 62.42 (2.4)
+DP - kernel SVM = 0.39 (0.19)
+Acc - linear SVM = 59.19 (3.26)
+DP - linear SVM = 0.42 (0.35)
+Acc - MLP = 61.3 (2.77)
+DP - MLP = 0.43 (0.21)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 35.45 (4.52)
+MMD = 0.03 (0.01)
+Acc - kernel SVM = 61.09 (1.19)
+DP - kernel SVM = 0.19 (0.11)
+Acc - linear SVM = 54.59 (0.57)
+DP - linear SVM = 0.03 (0.04)
+Acc - MLP = 57.61 (0.82)
+DP - MLP = 0.23 (0.12)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 33.15 (4.46)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 60.3 (1.54)
+DP - kernel SVM = 0.14 (0.08)
+Acc - linear SVM = 56.06 (1.27)
+DP - linear SVM = 0.1 (0.06)
+Acc - MLP = 57.73 (1.71)
+DP - MLP = 0.12 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 27.34 (4.92)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 63.67 (2.35)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 55.48 (1.52)
+DP - linear SVM = 0.01 (0.01)
+Acc - MLP = 62.82 (2.62)
+DP - MLP = 0.11 (0.05)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 21.89 (4.19)
+MMD = 0.22 (0.25)
+Acc - kernel SVM = 63.02 (1.27)
+DP - kernel SVM = 0.19 (0.14)
+Acc - linear SVM = 58.42 (2.82)
+DP - linear SVM = 0.12 (0.12)
+Acc - MLP = 61.78 (1.1)
+DP - MLP = 0.2 (0.15)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 24.95 (7.23)
+MMD = 0.09 (0.06)
+Acc - kernel SVM = 61.86 (1.63)
+DP - kernel SVM = 0.18 (0.09)
+Acc - linear SVM = 56.32 (2.46)
+DP - linear SVM = 0.06 (0.08)
+Acc - MLP = 60.53 (1.52)
+DP - MLP = 0.17 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 22.79 (5.57)
+MMD = 0.17 (0.15)
+Acc - kernel SVM = 61.85 (1.8)
+DP - kernel SVM = 0.23 (0.18)
+Acc - linear SVM = 56.07 (1.56)
+DP - linear SVM = 0.15 (0.26)
+Acc - MLP = 59.55 (2.12)
+DP - MLP = 0.22 (0.18)
+*******************************************************************************
+-----------------------------------------------------------------------------------
+Embedding dim = 10
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 100.0 (0.0)
+MMD = 0.24 (0.0)
+Acc - kernel SVM = 73.14 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.82 (0.92)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.58 (1.56)
+DP - MLP = 0.22 (0.07)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 87.79 (1.21)
+MMD = 0.02 (0.0)
+Acc - kernel SVM = 72.25 (0.88)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.71 (1.66)
+DP - linear SVM = 0.06 (0.05)
+Acc - MLP = 69.73 (1.95)
+DP - MLP = 0.15 (0.07)
+*******************************************************************************
+Method = FPCA-0
+Variance = 87.44 (1.28)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.32 (0.88)
+DP - kernel SVM = 0.16 (0.07)
+Acc - linear SVM = 64.76 (1.68)
+DP - linear SVM = 0.05 (0.03)
+Acc - MLP = 68.52 (1.25)
+DP - MLP = 0.08 (0.07)
+*******************************************************************************
+Method = MBFPCA-3
+Data not available in the repository of Lee et al.
+***************************************************************************
+Method = MBFPCA-6
+Variance = 87.75 (1.29)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.19 (0.88)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.97 (1.51)
+DP - linear SVM = 0.08 (0.04)
+Acc - MLP = 68.53 (1.03)
+DP - MLP = 0.08 (0.05)
+*******************************************************************************
+Method = INLP
+Variance = 91.09 (0.88)
+MMD = 0.03 (0.01)
+Acc - kernel SVM = 71.4 (0.9)
+DP - kernel SVM = 0.17 (0.03)
+Acc - linear SVM = 64.91 (0.92)
+DP - linear SVM = 0.18 (0.04)
+Acc - MLP = 68.46 (0.99)
+DP - MLP = 0.19 (0.03)
+*******************************************************************************
+Method = RLACE
+Variance = 87.46 (1.27)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.28 (0.83)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.84 (1.63)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 68.11 (1.52)
+DP - MLP = 0.1 (0.05)
+*******************************************************************************
+Method = Fair PCA
+Variance = 87.44 (1.28)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.31 (0.88)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.75 (1.7)
+DP - linear SVM = 0.05 (0.03)
+Acc - MLP = 68.18 (1.42)
+DP - MLP = 0.1 (0.06)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 65.96 (1.12)
+DP - kernel SVM = 0.26 (0.07)
+Acc - linear SVM = 64.35 (0.8)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 66.84 (1.15)
+DP - MLP = 0.12 (0.08)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 87.44 (1.28)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.31 (0.88)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.7 (1.75)
+DP - linear SVM = 0.05 (0.03)
+Acc - MLP = 68.16 (1.47)
+DP - MLP = 0.09 (0.04)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 87.44 (1.28)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.31 (0.88)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.7 (1.75)
+DP - linear SVM = 0.05 (0.03)
+Acc - MLP = 68.16 (1.47)
+DP - MLP = 0.09 (0.04)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 73.14 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.83 (0.96)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.37 (1.43)
+DP - MLP = 0.29 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 99.81 (0.32)
+MMD = 0.24 (0.01)
+Acc - kernel SVM = 73.16 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.78 (1.03)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 70.46 (1.86)
+DP - MLP = 0.23 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 93.39 (4.43)
+MMD = 0.22 (0.03)
+Acc - kernel SVM = 72.91 (1.1)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.99 (1.1)
+DP - linear SVM = 0.2 (0.06)
+Acc - MLP = 70.23 (1.01)
+DP - MLP = 0.24 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 88.84 (3.06)
+MMD = 0.25 (0.01)
+Acc - kernel SVM = 71.94 (1.69)
+DP - kernel SVM = 0.23 (0.05)
+Acc - linear SVM = 65.13 (1.11)
+DP - linear SVM = 0.19 (0.05)
+Acc - MLP = 69.58 (1.2)
+DP - MLP = 0.23 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 94.54 (3.04)
+MMD = 0.22 (0.03)
+Acc - kernel SVM = 73.06 (1.18)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.84 (0.95)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.43 (1.64)
+DP - MLP = 0.23 (0.09)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 93.52 (3.48)
+MMD = 0.17 (0.02)
+Acc - kernel SVM = 72.75 (1.04)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 65.01 (1.17)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.51 (1.43)
+DP - MLP = 0.23 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 93.52 (3.48)
+MMD = 0.25 (0.01)
+Acc - kernel SVM = 72.75 (1.04)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 65.01 (1.17)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.51 (1.43)
+DP - MLP = 0.23 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 100.0 (0.0)
+MMD = 0.24 (0.0)
+Acc - kernel SVM = 73.14 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.8 (0.97)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.91 (1.41)
+DP - MLP = 0.23 (0.09)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 100.0 (0.0)
+MMD = 0.24 (0.0)
+Acc - kernel SVM = 73.14 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.8 (0.98)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 70.35 (1.85)
+DP - MLP = 0.23 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 100.0 (0.0)
+MMD = 0.24 (0.0)
+Acc - kernel SVM = 73.14 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.79 (0.97)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 70.15 (1.45)
+DP - MLP = 0.24 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 97.82 (3.13)
+MMD = 0.23 (0.05)
+Acc - kernel SVM = 73.09 (1.1)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.76 (0.99)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.5 (1.18)
+DP - MLP = 0.25 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 92.27 (3.8)
+MMD = 0.15 (0.05)
+Acc - kernel SVM = 73.06 (1.1)
+DP - kernel SVM = 0.21 (0.07)
+Acc - linear SVM = 64.84 (0.97)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 70.09 (1.02)
+DP - MLP = 0.21 (0.1)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 94.78 (3.84)
+MMD = 0.25 (0.01)
+Acc - kernel SVM = 73.02 (1.09)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.82 (0.93)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.26 (1.5)
+DP - MLP = 0.23 (0.08)
+*******************************************************************************
+
+
+
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+Dataset = German
+-----------------------------------------------------------------------------------
+Embedding dim = 2
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 11.42 (0.45)
+MMD = 0.15 (0.05)
+Acc - kernel SVM = 76.87 (1.32)
+DP - kernel SVM = 0.12 (0.06)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 71.6 (1.69)
+DP - MLP = 0.08 (0.07)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 7.43 (0.56)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 72.17 (1.04)
+DP - kernel SVM = 0.03 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.27 (1.38)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = FPCA-0
+Variance = 7.33 (0.54)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 71.77 (1.52)
+DP - kernel SVM = 0.03 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.83 (1.49)
+DP - MLP = 0.0 (0.01)
+*******************************************************************************
+Method = MBFPCA-3
+Variance = 10.17 (0.54)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 74.53 (1.82)
+DP - kernel SVM = 0.05 (0.04)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 71.03 (1.36)
+DP - MLP = 0.03 (0.02)
+*******************************************************************************
+Method = MBFPCA-6
+Variance = 9.36 (0.31)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 74.1 (1.48)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.97 (0.82)
+DP - MLP = 0.02 (0.01)
+*******************************************************************************
+Method = INLP
+Variance = 3.06 (0.33)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 70.87 (1.8)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.03 (1.37)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = RLACE
+Variance = 3.48 (0.4)
+MMD = 0.04 (0.02)
+Acc - kernel SVM = 72.03 (1.66)
+DP - kernel SVM = 0.04 (0.05)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.67 (1.58)
+DP - MLP = 0.02 (0.03)
+*******************************************************************************
+Method = Fair PCA
+Variance = 10.85 (0.55)
+MMD = 0.03 (0.02)
+Acc - kernel SVM = 75.6 (1.89)
+DP - kernel SVM = 0.06 (0.05)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 72.03 (1.98)
+DP - MLP = 0.04 (0.05)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 69.8 (1.21)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.8 (1.21)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 4.73 (0.43)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 72.47 (3.14)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.97 (2.19)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 7.43 (0.42)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 72.93 (2.05)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.83 (1.73)
+DP - MLP = 0.02 (0.03)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 73.73 (1.38)
+DP - kernel SVM = 0.05 (0.03)
+Acc - linear SVM = 69.97 (0.82)
+DP - linear SVM = 0.0 (0.01)
+Acc - MLP = 72.97 (1.4)
+DP - MLP = 0.04 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 10.85 (0.55)
+MMD = 0.03 (0.02)
+Acc - kernel SVM = 75.6 (1.89)
+DP - kernel SVM = 0.06 (0.05)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 71.0 (2.66)
+DP - MLP = 0.07 (0.05)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 8.83 (0.97)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 74.1 (1.84)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 70.07 (0.66)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 70.6 (1.19)
+DP - MLP = 0.03 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 7.87 (0.43)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 74.27 (2.35)
+DP - kernel SVM = 0.05 (0.04)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 71.17 (1.65)
+DP - MLP = 0.04 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 7.29 (0.49)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 73.1 (1.76)
+DP - kernel SVM = 0.02 (0.01)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.27 (1.39)
+DP - MLP = 0.03 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 4.95 (0.46)
+MMD = 0.03 (0.01)
+Acc - kernel SVM = 71.57 (2.39)
+DP - kernel SVM = 0.01 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.5 (1.74)
+DP - MLP = 0.02 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 0.0 (0.0)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 69.8 (1.21)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.8 (1.21)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 10.71 (0.62)
+MMD = 0.03 (0.02)
+Acc - kernel SVM = 75.6 (2.28)
+DP - kernel SVM = 0.06 (0.05)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.5 (2.53)
+DP - MLP = 0.06 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 9.36 (0.83)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 75.17 (1.2)
+DP - kernel SVM = 0.04 (0.04)
+Acc - linear SVM = 70.0 (0.76)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 70.17 (1.61)
+DP - MLP = 0.02 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 7.69 (0.35)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 72.57 (0.78)
+DP - kernel SVM = 0.02 (0.01)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.5 (0.75)
+DP - MLP = 0.02 (0.01)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 6.93 (0.54)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 72.93 (2.94)
+DP - kernel SVM = 0.03 (0.03)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.73 (1.08)
+DP - MLP = 0.02 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 5.01 (0.52)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 72.3 (2.11)
+DP - kernel SVM = 0.03 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.67 (2.39)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 1.84 (0.42)
+MMD = 0.31 (0.34)
+Acc - kernel SVM = 69.93 (1.26)
+DP - kernel SVM = 0.01 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.9 (1.2)
+DP - MLP = 0.0 (0.01)
+*******************************************************************************
+-----------------------------------------------------------------------------------
+Embedding dim = 10
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 38.24 (0.92)
+MMD = 0.13 (0.02)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 74.8 (1.93)
+DP - linear SVM = 0.15 (0.11)
+Acc - MLP = 96.7 (1.74)
+DP - MLP = 0.12 (0.07)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 29.85 (0.82)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 71.13 (2.75)
+DP - linear SVM = 0.02 (0.03)
+Acc - MLP = 96.77 (1.8)
+DP - MLP = 0.1 (0.07)
+*******************************************************************************
+Method = FPCA-0
+Variance = 29.74 (0.84)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 70.87 (2.38)
+DP - linear SVM = 0.02 (0.04)
+Acc - MLP = 96.4 (1.77)
+DP - MLP = 0.1 (0.07)
+*******************************************************************************
+Method = MBFPCA-3
+Variance = 34.1 (0.96)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 73.6 (2.62)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 96.03 (1.36)
+DP - MLP = 0.09 (0.06)
+*******************************************************************************
+Method = MBFPCA-6
+Variance = 16.95 (1.45)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 92.7 (2.84)
+DP - kernel SVM = 0.06 (0.05)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 79.23 (5.34)
+DP - MLP = 0.05 (0.04)
+*******************************************************************************
+Method = INLP
+Variance = 15.36 (0.53)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 98.93 (0.74)
+DP - kernel SVM = 0.11 (0.06)
+Acc - linear SVM = 69.9 (0.97)
+DP - linear SVM = 0.0 (0.01)
+Acc - MLP = 93.63 (2.68)
+DP - MLP = 0.11 (0.07)
+*******************************************************************************
+Method = RLACE
+Variance = 17.16 (0.58)
+MMD = 0.02 (0.02)
+Acc - kernel SVM = 99.63 (0.41)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 70.57 (2.15)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 95.57 (2.73)
+DP - MLP = 0.1 (0.06)
+*******************************************************************************
+Method = Fair PCA
+Variance = 36.63 (1.04)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 74.1 (2.23)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 96.03 (2.26)
+DP - MLP = 0.11 (0.04)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 70.1 (1.18)
+DP - kernel SVM = 0.0 (0.01)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 74.4 (2.15)
+DP - MLP = 0.06 (0.04)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 20.51 (0.79)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 99.87 (0.22)
+DP - kernel SVM = 0.12 (0.08)
+Acc - linear SVM = 71.6 (2.83)
+DP - linear SVM = 0.02 (0.04)
+Acc - MLP = 96.13 (1.44)
+DP - MLP = 0.1 (0.05)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 28.83 (0.82)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 71.87 (2.62)
+DP - linear SVM = 0.03 (0.04)
+Acc - MLP = 97.0 (1.13)
+DP - MLP = 0.1 (0.07)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 98.73 (0.7)
+DP - kernel SVM = 0.1 (0.07)
+Acc - linear SVM = 76.8 (1.9)
+DP - linear SVM = 0.09 (0.07)
+Acc - MLP = 98.13 (0.69)
+DP - MLP = 0.12 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 36.63 (1.04)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 74.1 (2.23)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 95.83 (1.94)
+DP - MLP = 0.11 (0.08)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 33.21 (1.2)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.9 (0.21)
+DP - kernel SVM = 0.13 (0.07)
+Acc - linear SVM = 73.63 (2.21)
+DP - linear SVM = 0.05 (0.05)
+Acc - MLP = 95.67 (2.09)
+DP - MLP = 0.11 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 31.16 (1.07)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 73.3 (2.48)
+DP - linear SVM = 0.04 (0.04)
+Acc - MLP = 96.37 (1.49)
+DP - MLP = 0.11 (0.09)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 27.62 (0.76)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 71.1 (2.62)
+DP - linear SVM = 0.01 (0.01)
+Acc - MLP = 95.0 (2.29)
+DP - MLP = 0.11 (0.08)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 21.5 (0.98)
+MMD = 0.02 (0.0)
+Acc - kernel SVM = 99.87 (0.22)
+DP - kernel SVM = 0.13 (0.07)
+Acc - linear SVM = 71.9 (3.31)
+DP - linear SVM = 0.01 (0.01)
+Acc - MLP = 96.33 (1.28)
+DP - MLP = 0.12 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 9.87 (1.53)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 85.27 (4.45)
+DP - kernel SVM = 0.07 (0.04)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 78.5 (3.91)
+DP - MLP = 0.06 (0.04)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 35.72 (0.83)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.9 (0.15)
+DP - kernel SVM = 0.13 (0.07)
+Acc - linear SVM = 73.0 (2.03)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 96.0 (2.48)
+DP - MLP = 0.1 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 33.82 (1.25)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 71.8 (1.17)
+DP - linear SVM = 0.02 (0.03)
+Acc - MLP = 95.63 (2.58)
+DP - MLP = 0.11 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 31.0 (0.89)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 72.77 (2.13)
+DP - linear SVM = 0.03 (0.05)
+Acc - MLP = 96.0 (2.0)
+DP - MLP = 0.09 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 27.51 (0.97)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.9 (0.15)
+DP - kernel SVM = 0.13 (0.07)
+Acc - linear SVM = 71.9 (2.97)
+DP - linear SVM = 0.02 (0.03)
+Acc - MLP = 96.23 (1.93)
+DP - MLP = 0.11 (0.08)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 21.27 (0.85)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.83 (0.22)
+DP - kernel SVM = 0.12 (0.08)
+Acc - linear SVM = 71.53 (3.33)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 96.1 (1.69)
+DP - MLP = 0.11 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 9.57 (0.7)
+MMD = 0.1 (0.1)
+Acc - kernel SVM = 86.47 (2.99)
+DP - kernel SVM = 0.12 (0.06)
+Acc - linear SVM = 70.73 (3.11)
+DP - linear SVM = 0.02 (0.05)
+Acc - MLP = 75.23 (4.23)
+DP - MLP = 0.08 (0.06)
+*******************************************************************************
+
+
+
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+Dataset = Adult
+-----------------------------------------------------------------------------------
+Embedding dim = 2
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 7.78 (0.77)
+MMD = 0.35 (0.03)
+Acc - kernel SVM = 82.03 (1.09)
+DP - kernel SVM = 0.2 (0.05)
+Acc - linear SVM = 79.87 (1.11)
+DP - linear SVM = 0.2 (0.04)
+Acc - MLP = 81.21 (1.22)
+DP - MLP = 0.22 (0.03)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 4.05 (0.93)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 77.44 (2.81)
+DP - kernel SVM = 0.04 (0.03)
+Acc - linear SVM = 75.54 (1.98)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 76.19 (2.44)
+DP - MLP = 0.02 (0.03)
+*******************************************************************************
+Method = FPCA-0
+Variance = 3.65 (0.92)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 77.05 (3.02)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 75.51 (1.93)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 76.24 (2.81)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = MBFPCA-3
+Variance = 6.03 (0.58)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 79.5 (1.15)
+DP - kernel SVM = 0.03 (0.02)
+Acc - linear SVM = 76.88 (1.95)
+DP - linear SVM = 0.01 (0.01)
+Acc - MLP = 78.29 (1.6)
+DP - MLP = 0.02 (0.01)
+*******************************************************************************
+Method = MBFPCA-6
+Variance = 5.83 (0.54)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 79.12 (1.08)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 76.72 (1.89)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 78.01 (1.29)
+DP - MLP = 0.02 (0.01)
+*******************************************************************************
+Method = INLP
+Variance = 2.06 (0.27)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 75.61 (1.41)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.33 (1.39)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = RLACE
+Variance = 2.02 (0.21)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 75.88 (1.51)
+DP - kernel SVM = 0.01 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.54 (1.42)
+DP - MLP = 0.01 (0.02)
+*******************************************************************************
+Method = Fair PCA
+Variance = 6.37 (0.65)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 80.25 (1.59)
+DP - kernel SVM = 0.06 (0.02)
+Acc - linear SVM = 77.26 (1.79)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 78.63 (1.36)
+DP - MLP = 0.04 (0.02)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 75.11 (1.66)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 77.17 (1.82)
+DP - MLP = 0.03 (0.02)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 3.05 (0.3)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 75.85 (1.59)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.26 (1.63)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 4.27 (0.34)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 76.07 (1.34)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 74.99 (1.79)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 81.59 (1.12)
+DP - kernel SVM = 0.14 (0.03)
+Acc - linear SVM = 80.8 (1.09)
+DP - linear SVM = 0.13 (0.04)
+Acc - MLP = 82.02 (1.03)
+DP - MLP = 0.18 (0.04)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 6.37 (0.65)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 80.24 (1.57)
+DP - kernel SVM = 0.06 (0.02)
+Acc - linear SVM = 77.26 (1.79)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 78.65 (1.47)
+DP - MLP = 0.05 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 6.09 (0.59)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 79.22 (1.56)
+DP - kernel SVM = 0.07 (0.02)
+Acc - linear SVM = 76.2 (1.96)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 77.73 (1.16)
+DP - MLP = 0.05 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 5.71 (0.63)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 78.59 (1.67)
+DP - kernel SVM = 0.03 (0.03)
+Acc - linear SVM = 75.68 (2.1)
+DP - linear SVM = 0.0 (0.01)
+Acc - MLP = 77.36 (1.89)
+DP - MLP = 0.02 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 5.24 (0.5)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 78.09 (1.28)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 77.14 (1.46)
+DP - MLP = 0.02 (0.01)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 3.94 (0.43)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 76.27 (1.46)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.41 (1.41)
+DP - MLP = 0.0 (0.01)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 3.02 (0.31)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 75.6 (1.49)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.21 (1.76)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 6.29 (0.63)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 79.99 (1.44)
+DP - kernel SVM = 0.04 (0.03)
+Acc - linear SVM = 76.85 (1.88)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 78.23 (1.73)
+DP - MLP = 0.04 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 5.89 (0.61)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 78.9 (1.2)
+DP - kernel SVM = 0.05 (0.03)
+Acc - linear SVM = 75.74 (1.59)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 77.54 (1.43)
+DP - MLP = 0.05 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 5.71 (0.56)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 78.34 (1.02)
+DP - kernel SVM = 0.04 (0.03)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 77.11 (1.26)
+DP - MLP = 0.03 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 5.18 (0.37)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 78.11 (1.86)
+DP - kernel SVM = 0.03 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 77.32 (1.55)
+DP - MLP = 0.03 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 3.5 (0.43)
+MMD = 0.03 (0.01)
+Acc - kernel SVM = 75.82 (1.5)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.15 (1.58)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 2.8 (0.35)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 75.51 (1.54)
+DP - kernel SVM = 0.0 (0.01)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.1 (1.64)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+-----------------------------------------------------------------------------------
+Embedding dim = 10
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 21.77 (1.95)
+MMD = 0.2 (0.01)
+Acc - kernel SVM = 93.64 (0.87)
+DP - kernel SVM = 0.16 (0.01)
+Acc - linear SVM = 82.7 (0.94)
+DP - linear SVM = 0.18 (0.02)
+Acc - MLP = 89.06 (2.07)
+DP - MLP = 0.2 (0.03)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 15.75 (1.14)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 91.94 (0.84)
+DP - kernel SVM = 0.13 (0.02)
+Acc - linear SVM = 78.1 (2.15)
+DP - linear SVM = 0.03 (0.02)
+Acc - MLP = 87.17 (1.1)
+DP - MLP = 0.11 (0.04)
+*******************************************************************************
+Method = FPCA-0
+Variance = 15.52 (1.12)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 91.66 (0.92)
+DP - kernel SVM = 0.13 (0.02)
+Acc - linear SVM = 77.72 (2.06)
+DP - linear SVM = 0.03 (0.02)
+Acc - MLP = 85.38 (2.08)
+DP - MLP = 0.09 (0.03)
+*******************************************************************************
+Method = MBFPCA-3
+Data not available in the repository of Lee et al.
+***************************************************************************
+Method = MBFPCA-6
+Variance = 15.49 (6.11)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 86.36 (3.58)
+DP - kernel SVM = 0.07 (0.03)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 81.69 (2.89)
+DP - MLP = 0.04 (0.03)
+*******************************************************************************
+Method = INLP
+Variance = 10.7 (0.8)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 88.95 (1.23)
+DP - kernel SVM = 0.1 (0.03)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 84.61 (1.39)
+DP - MLP = 0.1 (0.04)
+*******************************************************************************
+Method = RLACE
+Variance = 10.03 (0.51)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 91.34 (0.77)
+DP - kernel SVM = 0.12 (0.03)
+Acc - linear SVM = 75.24 (1.7)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 87.2 (2.15)
+DP - MLP = 0.12 (0.02)
+*******************************************************************************
+Method = Fair PCA
+Variance = 19.62 (1.73)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 93.42 (0.8)
+DP - kernel SVM = 0.16 (0.01)
+Acc - linear SVM = 81.31 (1.23)
+DP - linear SVM = 0.04 (0.02)
+Acc - MLP = 88.57 (1.66)
+DP - MLP = 0.16 (0.02)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 79.9 (1.54)
+DP - kernel SVM = 0.04 (0.03)
+Acc - linear SVM = 78.34 (1.21)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 81.18 (2.07)
+DP - MLP = 0.06 (0.05)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 12.75 (1.31)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 86.85 (1.79)
+DP - kernel SVM = 0.09 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 83.09 (2.17)
+DP - MLP = 0.08 (0.05)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 15.79 (1.05)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 91.81 (1.05)
+DP - kernel SVM = 0.15 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 86.47 (2.23)
+DP - MLP = 0.14 (0.03)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 87.78 (0.87)
+DP - kernel SVM = 0.18 (0.02)
+Acc - linear SVM = 83.2 (1.09)
+DP - linear SVM = 0.13 (0.03)
+Acc - MLP = 91.34 (2.04)
+DP - MLP = 0.18 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 19.62 (1.73)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 93.42 (0.8)
+DP - kernel SVM = 0.16 (0.01)
+Acc - linear SVM = 81.31 (1.23)
+DP - linear SVM = 0.04 (0.02)
+Acc - MLP = 88.6 (1.98)
+DP - MLP = 0.17 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 18.89 (1.48)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 93.05 (0.68)
+DP - kernel SVM = 0.15 (0.01)
+Acc - linear SVM = 80.54 (1.25)
+DP - linear SVM = 0.09 (0.03)
+Acc - MLP = 88.87 (2.08)
+DP - MLP = 0.15 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 18.33 (1.62)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 92.64 (0.61)
+DP - kernel SVM = 0.16 (0.01)
+Acc - linear SVM = 78.69 (3.35)
+DP - linear SVM = 0.06 (0.05)
+Acc - MLP = 88.01 (1.61)
+DP - MLP = 0.15 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 17.38 (1.23)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 92.21 (1.04)
+DP - kernel SVM = 0.15 (0.02)
+Acc - linear SVM = 75.55 (1.36)
+DP - linear SVM = 0.01 (0.01)
+Acc - MLP = 87.11 (1.58)
+DP - MLP = 0.14 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 14.69 (1.19)
+MMD = 0.02 (0.0)
+Acc - kernel SVM = 90.4 (1.26)
+DP - kernel SVM = 0.14 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 86.27 (1.49)
+DP - MLP = 0.13 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 12.75 (1.16)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 86.66 (1.87)
+DP - kernel SVM = 0.09 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 83.53 (1.87)
+DP - MLP = 0.08 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 19.35 (1.44)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 93.59 (0.64)
+DP - kernel SVM = 0.15 (0.01)
+Acc - linear SVM = 81.46 (1.14)
+DP - linear SVM = 0.04 (0.02)
+Acc - MLP = 89.44 (1.74)
+DP - MLP = 0.16 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 18.86 (1.44)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 93.45 (0.54)
+DP - kernel SVM = 0.15 (0.01)
+Acc - linear SVM = 81.06 (1.47)
+DP - linear SVM = 0.06 (0.03)
+Acc - MLP = 88.19 (1.5)
+DP - MLP = 0.16 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 18.0 (1.29)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 92.52 (0.75)
+DP - kernel SVM = 0.16 (0.02)
+Acc - linear SVM = 79.66 (1.38)
+DP - linear SVM = 0.08 (0.04)
+Acc - MLP = 88.16 (1.24)
+DP - MLP = 0.15 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 17.12 (0.92)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 91.97 (1.04)
+DP - kernel SVM = 0.15 (0.02)
+Acc - linear SVM = 76.05 (2.35)
+DP - linear SVM = 0.02 (0.04)
+Acc - MLP = 87.72 (2.0)
+DP - MLP = 0.14 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 14.3 (1.1)
+MMD = 0.02 (0.0)
+Acc - kernel SVM = 90.68 (1.16)
+DP - kernel SVM = 0.14 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 85.95 (1.27)
+DP - MLP = 0.13 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 12.62 (1.3)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 86.73 (2.05)
+DP - kernel SVM = 0.09 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 83.74 (1.65)
+DP - MLP = 0.07 (0.02)
+*******************************************************************************
+
+
+
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+Dataset = COMPAS
+-----------------------------------------------------------------------------------
+Embedding dim = 2
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 39.28 (4.91)
+MMD = 0.09 (0.01)
+Acc - kernel SVM = 64.53 (1.38)
+DP - kernel SVM = 0.29 (0.08)
+Acc - linear SVM = 56.67 (1.53)
+DP - linear SVM = 0.2 (0.09)
+Acc - MLP = 60.82 (2.65)
+DP - MLP = 0.3 (0.06)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 35.06 (4.9)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 61.65 (1.11)
+DP - kernel SVM = 0.1 (0.06)
+Acc - linear SVM = 56.25 (1.2)
+DP - linear SVM = 0.04 (0.03)
+Acc - MLP = 57.61 (1.67)
+DP - MLP = 0.08 (0.04)
+*******************************************************************************
+Method = FPCA-0
+Variance = 34.43 (4.76)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 60.86 (1.03)
+DP - kernel SVM = 0.11 (0.06)
+Acc - linear SVM = 55.9 (1.26)
+DP - linear SVM = 0.03 (0.03)
+Acc - MLP = 56.9 (1.88)
+DP - MLP = 0.09 (0.03)
+*******************************************************************************
+Method = MBFPCA-3
+Variance = 33.95 (4.75)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 65.36 (1.08)
+DP - kernel SVM = 0.12 (0.06)
+Acc - linear SVM = 58.39 (1.4)
+DP - linear SVM = 0.08 (0.05)
+Acc - MLP = 60.88 (1.57)
+DP - MLP = 0.1 (0.04)
+*******************************************************************************
+Method = MBFPCA-6
+Variance = 11.83 (3.4)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 57.73 (1.42)
+DP - kernel SVM = 0.06 (0.07)
+Acc - linear SVM = 56.02 (1.98)
+DP - linear SVM = 0.02 (0.03)
+Acc - MLP = 56.55 (1.56)
+DP - MLP = 0.06 (0.08)
+*******************************************************************************
+Method = INLP
+Variance = 0.36 (1.08)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 54.52 (0.7)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 54.52 (0.7)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 54.62 (0.77)
+DP - MLP = 0.0 (0.01)
+*******************************************************************************
+Method = RLACE
+Variance = 17.08 (2.6)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 62.71 (1.99)
+DP - kernel SVM = 0.09 (0.05)
+Acc - linear SVM = 56.37 (2.18)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 60.09 (2.69)
+DP - MLP = 0.07 (0.05)
+*******************************************************************************
+Method = Fair PCA
+Variance = 35.56 (4.52)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 62.82 (0.88)
+DP - kernel SVM = 0.11 (0.08)
+Acc - linear SVM = 54.55 (0.76)
+DP - linear SVM = 0.03 (0.04)
+Acc - MLP = 60.65 (2.29)
+DP - MLP = 0.13 (0.11)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 57.8 (1.82)
+DP - kernel SVM = 0.08 (0.06)
+Acc - linear SVM = 54.74 (1.21)
+DP - linear SVM = 0.02 (0.04)
+Acc - MLP = 57.72 (1.66)
+DP - MLP = 0.06 (0.06)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 25.11 (5.14)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 64.1 (1.49)
+DP - kernel SVM = 0.15 (0.06)
+Acc - linear SVM = 58.08 (2.92)
+DP - linear SVM = 0.07 (0.05)
+Acc - MLP = 62.63 (1.74)
+DP - MLP = 0.14 (0.07)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 35.42 (4.49)
+MMD = 0.03 (0.01)
+Acc - kernel SVM = 60.93 (0.6)
+DP - kernel SVM = 0.14 (0.04)
+Acc - linear SVM = 55.43 (0.94)
+DP - linear SVM = 0.06 (0.08)
+Acc - MLP = 57.03 (1.58)
+DP - MLP = 0.14 (0.1)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 63.89 (1.86)
+DP - kernel SVM = 0.2 (0.05)
+Acc - linear SVM = 57.94 (2.22)
+DP - linear SVM = 0.12 (0.05)
+Acc - MLP = 63.95 (3.98)
+DP - MLP = 0.18 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 35.56 (4.52)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 62.82 (0.88)
+DP - kernel SVM = 0.11 (0.08)
+Acc - linear SVM = 54.55 (0.76)
+DP - linear SVM = 0.03 (0.04)
+Acc - MLP = 59.74 (1.72)
+DP - MLP = 0.12 (0.09)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 34.13 (5.35)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 60.86 (1.07)
+DP - kernel SVM = 0.14 (0.06)
+Acc - linear SVM = 55.41 (0.81)
+DP - linear SVM = 0.04 (0.06)
+Acc - MLP = 57.64 (1.26)
+DP - MLP = 0.15 (0.11)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 25.06 (5.13)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 64.14 (1.5)
+DP - kernel SVM = 0.15 (0.06)
+Acc - linear SVM = 58.23 (3.04)
+DP - linear SVM = 0.07 (0.06)
+Acc - MLP = 62.42 (2.21)
+DP - MLP = 0.14 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 13.24 (5.03)
+MMD = 0.03 (0.02)
+Acc - kernel SVM = 61.66 (2.3)
+DP - kernel SVM = 0.15 (0.08)
+Acc - linear SVM = 57.3 (2.45)
+DP - linear SVM = 0.05 (0.05)
+Acc - MLP = 61.05 (3.43)
+DP - MLP = 0.12 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 18.57 (2.78)
+MMD = 0.22 (0.11)
+Acc - kernel SVM = 62.42 (2.4)
+DP - kernel SVM = 0.39 (0.19)
+Acc - linear SVM = 59.19 (3.26)
+DP - linear SVM = 0.42 (0.35)
+Acc - MLP = 61.3 (2.77)
+DP - MLP = 0.43 (0.21)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 18.57 (2.78)
+MMD = 0.47 (0.27)
+Acc - kernel SVM = 62.42 (2.4)
+DP - kernel SVM = 0.39 (0.19)
+Acc - linear SVM = 59.19 (3.26)
+DP - linear SVM = 0.42 (0.35)
+Acc - MLP = 61.3 (2.77)
+DP - MLP = 0.43 (0.21)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 35.45 (4.52)
+MMD = 0.03 (0.01)
+Acc - kernel SVM = 61.09 (1.19)
+DP - kernel SVM = 0.19 (0.11)
+Acc - linear SVM = 54.59 (0.57)
+DP - linear SVM = 0.03 (0.04)
+Acc - MLP = 57.61 (0.82)
+DP - MLP = 0.23 (0.12)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 33.15 (4.46)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 60.3 (1.54)
+DP - kernel SVM = 0.14 (0.08)
+Acc - linear SVM = 56.06 (1.27)
+DP - linear SVM = 0.1 (0.06)
+Acc - MLP = 57.73 (1.71)
+DP - MLP = 0.12 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 27.34 (4.92)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 63.67 (2.35)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 55.48 (1.52)
+DP - linear SVM = 0.01 (0.01)
+Acc - MLP = 62.82 (2.62)
+DP - MLP = 0.11 (0.05)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 21.89 (4.19)
+MMD = 0.22 (0.25)
+Acc - kernel SVM = 63.02 (1.27)
+DP - kernel SVM = 0.19 (0.14)
+Acc - linear SVM = 58.42 (2.82)
+DP - linear SVM = 0.12 (0.12)
+Acc - MLP = 61.78 (1.1)
+DP - MLP = 0.2 (0.15)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 24.95 (7.23)
+MMD = 0.09 (0.06)
+Acc - kernel SVM = 61.86 (1.63)
+DP - kernel SVM = 0.18 (0.09)
+Acc - linear SVM = 56.32 (2.46)
+DP - linear SVM = 0.06 (0.08)
+Acc - MLP = 60.53 (1.52)
+DP - MLP = 0.17 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 22.79 (5.57)
+MMD = 0.17 (0.15)
+Acc - kernel SVM = 61.85 (1.8)
+DP - kernel SVM = 0.23 (0.18)
+Acc - linear SVM = 56.07 (1.56)
+DP - linear SVM = 0.15 (0.26)
+Acc - MLP = 59.55 (2.12)
+DP - MLP = 0.22 (0.18)
+*******************************************************************************
+-----------------------------------------------------------------------------------
+Embedding dim = 10
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 100.0 (0.0)
+MMD = 0.24 (0.0)
+Acc - kernel SVM = 73.14 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.82 (0.92)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.58 (1.56)
+DP - MLP = 0.22 (0.07)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 87.79 (1.21)
+MMD = 0.02 (0.0)
+Acc - kernel SVM = 72.25 (0.88)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.71 (1.66)
+DP - linear SVM = 0.06 (0.05)
+Acc - MLP = 69.73 (1.95)
+DP - MLP = 0.15 (0.07)
+*******************************************************************************
+Method = FPCA-0
+Variance = 87.44 (1.28)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.32 (0.88)
+DP - kernel SVM = 0.16 (0.07)
+Acc - linear SVM = 64.76 (1.68)
+DP - linear SVM = 0.05 (0.03)
+Acc - MLP = 68.52 (1.25)
+DP - MLP = 0.08 (0.07)
+*******************************************************************************
+Method = MBFPCA-3
+Data not available in the repository of Lee et al.
+***************************************************************************
+Method = MBFPCA-6
+Variance = 87.75 (1.29)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.19 (0.88)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.97 (1.51)
+DP - linear SVM = 0.08 (0.04)
+Acc - MLP = 68.53 (1.03)
+DP - MLP = 0.08 (0.05)
+*******************************************************************************
+Method = INLP
+Variance = 91.09 (0.88)
+MMD = 0.03 (0.01)
+Acc - kernel SVM = 71.4 (0.9)
+DP - kernel SVM = 0.17 (0.03)
+Acc - linear SVM = 64.91 (0.92)
+DP - linear SVM = 0.18 (0.04)
+Acc - MLP = 68.46 (0.99)
+DP - MLP = 0.19 (0.03)
+*******************************************************************************
+Method = RLACE
+Variance = 87.46 (1.27)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.28 (0.83)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.84 (1.63)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 68.11 (1.52)
+DP - MLP = 0.1 (0.05)
+*******************************************************************************
+Method = Fair PCA
+Variance = 87.44 (1.28)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.31 (0.88)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.75 (1.7)
+DP - linear SVM = 0.05 (0.03)
+Acc - MLP = 68.18 (1.42)
+DP - MLP = 0.1 (0.06)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 65.96 (1.12)
+DP - kernel SVM = 0.26 (0.07)
+Acc - linear SVM = 64.35 (0.8)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 66.84 (1.15)
+DP - MLP = 0.12 (0.08)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 87.44 (1.28)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.31 (0.88)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.7 (1.75)
+DP - linear SVM = 0.05 (0.03)
+Acc - MLP = 68.16 (1.47)
+DP - MLP = 0.09 (0.04)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 87.44 (1.28)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 72.31 (0.88)
+DP - kernel SVM = 0.16 (0.06)
+Acc - linear SVM = 64.7 (1.75)
+DP - linear SVM = 0.05 (0.03)
+Acc - MLP = 68.16 (1.47)
+DP - MLP = 0.09 (0.04)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 73.14 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.83 (0.96)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.37 (1.43)
+DP - MLP = 0.29 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 99.81 (0.32)
+MMD = 0.24 (0.01)
+Acc - kernel SVM = 73.16 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.78 (1.03)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 70.46 (1.86)
+DP - MLP = 0.23 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 93.39 (4.43)
+MMD = 0.22 (0.03)
+Acc - kernel SVM = 72.91 (1.1)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.99 (1.1)
+DP - linear SVM = 0.2 (0.06)
+Acc - MLP = 70.23 (1.01)
+DP - MLP = 0.24 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 88.84 (3.06)
+MMD = 0.25 (0.01)
+Acc - kernel SVM = 71.94 (1.69)
+DP - kernel SVM = 0.23 (0.05)
+Acc - linear SVM = 65.13 (1.11)
+DP - linear SVM = 0.19 (0.05)
+Acc - MLP = 69.58 (1.2)
+DP - MLP = 0.23 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 94.54 (3.04)
+MMD = 0.22 (0.03)
+Acc - kernel SVM = 73.06 (1.18)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.84 (0.95)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.43 (1.64)
+DP - MLP = 0.23 (0.09)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 93.52 (3.48)
+MMD = 0.17 (0.02)
+Acc - kernel SVM = 72.75 (1.04)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 65.01 (1.17)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.51 (1.43)
+DP - MLP = 0.23 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 93.52 (3.48)
+MMD = 0.25 (0.01)
+Acc - kernel SVM = 72.75 (1.04)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 65.01 (1.17)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.51 (1.43)
+DP - MLP = 0.23 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 100.0 (0.0)
+MMD = 0.24 (0.0)
+Acc - kernel SVM = 73.14 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.8 (0.97)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.91 (1.41)
+DP - MLP = 0.23 (0.09)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 100.0 (0.0)
+MMD = 0.24 (0.0)
+Acc - kernel SVM = 73.14 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.8 (0.98)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 70.35 (1.85)
+DP - MLP = 0.23 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 100.0 (0.0)
+MMD = 0.24 (0.0)
+Acc - kernel SVM = 73.14 (1.16)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.79 (0.97)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 70.15 (1.45)
+DP - MLP = 0.24 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 97.82 (3.13)
+MMD = 0.23 (0.05)
+Acc - kernel SVM = 73.09 (1.1)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.76 (0.99)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.5 (1.18)
+DP - MLP = 0.25 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 92.27 (3.8)
+MMD = 0.15 (0.05)
+Acc - kernel SVM = 73.06 (1.1)
+DP - kernel SVM = 0.21 (0.07)
+Acc - linear SVM = 64.84 (0.97)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 70.09 (1.02)
+DP - MLP = 0.21 (0.1)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 94.78 (3.84)
+MMD = 0.25 (0.01)
+Acc - kernel SVM = 73.02 (1.09)
+DP - kernel SVM = 0.21 (0.06)
+Acc - linear SVM = 64.82 (0.93)
+DP - linear SVM = 0.18 (0.05)
+Acc - MLP = 69.26 (1.5)
+DP - MLP = 0.23 (0.08)
+*******************************************************************************
+
+
+
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+Dataset = German
+-----------------------------------------------------------------------------------
+Embedding dim = 2
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 11.42 (0.45)
+MMD = 0.15 (0.05)
+Acc - kernel SVM = 76.87 (1.32)
+DP - kernel SVM = 0.12 (0.06)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 71.6 (1.69)
+DP - MLP = 0.08 (0.07)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 7.43 (0.56)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 72.17 (1.04)
+DP - kernel SVM = 0.03 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.27 (1.38)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = FPCA-0
+Variance = 7.33 (0.54)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 71.77 (1.52)
+DP - kernel SVM = 0.03 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.83 (1.49)
+DP - MLP = 0.0 (0.01)
+*******************************************************************************
+Method = MBFPCA-3
+Variance = 10.17 (0.54)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 74.53 (1.82)
+DP - kernel SVM = 0.05 (0.04)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 71.03 (1.36)
+DP - MLP = 0.03 (0.02)
+*******************************************************************************
+Method = MBFPCA-6
+Variance = 9.36 (0.31)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 74.1 (1.48)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.97 (0.82)
+DP - MLP = 0.02 (0.01)
+*******************************************************************************
+Method = INLP
+Variance = 3.06 (0.33)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 70.87 (1.8)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.03 (1.37)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = RLACE
+Variance = 3.48 (0.4)
+MMD = 0.04 (0.02)
+Acc - kernel SVM = 72.03 (1.66)
+DP - kernel SVM = 0.04 (0.05)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.67 (1.58)
+DP - MLP = 0.02 (0.03)
+*******************************************************************************
+Method = Fair PCA
+Variance = 10.85 (0.55)
+MMD = 0.03 (0.02)
+Acc - kernel SVM = 75.6 (1.89)
+DP - kernel SVM = 0.06 (0.05)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 72.03 (1.98)
+DP - MLP = 0.04 (0.05)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 69.8 (1.21)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.8 (1.21)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 4.73 (0.43)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 72.47 (3.14)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.97 (2.19)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 7.43 (0.42)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 72.93 (2.05)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.83 (1.73)
+DP - MLP = 0.02 (0.03)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 73.73 (1.38)
+DP - kernel SVM = 0.05 (0.03)
+Acc - linear SVM = 69.97 (0.82)
+DP - linear SVM = 0.0 (0.01)
+Acc - MLP = 72.97 (1.4)
+DP - MLP = 0.04 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 10.85 (0.55)
+MMD = 0.03 (0.02)
+Acc - kernel SVM = 75.6 (1.89)
+DP - kernel SVM = 0.06 (0.05)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 71.0 (2.66)
+DP - MLP = 0.07 (0.05)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 8.83 (0.97)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 74.1 (1.84)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 70.07 (0.66)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 70.6 (1.19)
+DP - MLP = 0.03 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 7.87 (0.43)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 74.27 (2.35)
+DP - kernel SVM = 0.05 (0.04)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 71.17 (1.65)
+DP - MLP = 0.04 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 7.29 (0.49)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 73.1 (1.76)
+DP - kernel SVM = 0.02 (0.01)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.27 (1.39)
+DP - MLP = 0.03 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 4.95 (0.46)
+MMD = 0.03 (0.01)
+Acc - kernel SVM = 71.57 (2.39)
+DP - kernel SVM = 0.01 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.5 (1.74)
+DP - MLP = 0.02 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 0.0 (0.0)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 69.8 (1.21)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.8 (1.21)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 10.71 (0.62)
+MMD = 0.03 (0.02)
+Acc - kernel SVM = 75.6 (2.28)
+DP - kernel SVM = 0.06 (0.05)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.5 (2.53)
+DP - MLP = 0.06 (0.06)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 9.36 (0.83)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 75.17 (1.2)
+DP - kernel SVM = 0.04 (0.04)
+Acc - linear SVM = 70.0 (0.76)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 70.17 (1.61)
+DP - MLP = 0.02 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 7.69 (0.35)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 72.57 (0.78)
+DP - kernel SVM = 0.02 (0.01)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.5 (0.75)
+DP - MLP = 0.02 (0.01)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 6.93 (0.54)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 72.93 (2.94)
+DP - kernel SVM = 0.03 (0.03)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.73 (1.08)
+DP - MLP = 0.02 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 5.01 (0.52)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 72.3 (2.11)
+DP - kernel SVM = 0.03 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 70.67 (2.39)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 1.84 (0.42)
+MMD = 0.31 (0.34)
+Acc - kernel SVM = 69.93 (1.26)
+DP - kernel SVM = 0.01 (0.02)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 69.9 (1.2)
+DP - MLP = 0.0 (0.01)
+*******************************************************************************
+-----------------------------------------------------------------------------------
+Embedding dim = 10
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 38.24 (0.92)
+MMD = 0.13 (0.02)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 74.8 (1.93)
+DP - linear SVM = 0.15 (0.11)
+Acc - MLP = 96.7 (1.74)
+DP - MLP = 0.12 (0.07)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 29.85 (0.82)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 71.13 (2.75)
+DP - linear SVM = 0.02 (0.03)
+Acc - MLP = 96.77 (1.8)
+DP - MLP = 0.1 (0.07)
+*******************************************************************************
+Method = FPCA-0
+Variance = 29.74 (0.84)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 70.87 (2.38)
+DP - linear SVM = 0.02 (0.04)
+Acc - MLP = 96.4 (1.77)
+DP - MLP = 0.1 (0.07)
+*******************************************************************************
+Method = MBFPCA-3
+Variance = 34.1 (0.96)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 73.6 (2.62)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 96.03 (1.36)
+DP - MLP = 0.09 (0.06)
+*******************************************************************************
+Method = MBFPCA-6
+Variance = 16.95 (1.45)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 92.7 (2.84)
+DP - kernel SVM = 0.06 (0.05)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 79.23 (5.34)
+DP - MLP = 0.05 (0.04)
+*******************************************************************************
+Method = INLP
+Variance = 15.36 (0.53)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 98.93 (0.74)
+DP - kernel SVM = 0.11 (0.06)
+Acc - linear SVM = 69.9 (0.97)
+DP - linear SVM = 0.0 (0.01)
+Acc - MLP = 93.63 (2.68)
+DP - MLP = 0.11 (0.07)
+*******************************************************************************
+Method = RLACE
+Variance = 17.16 (0.58)
+MMD = 0.02 (0.02)
+Acc - kernel SVM = 99.63 (0.41)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 70.57 (2.15)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 95.57 (2.73)
+DP - MLP = 0.1 (0.06)
+*******************************************************************************
+Method = Fair PCA
+Variance = 36.63 (1.04)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 74.1 (2.23)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 96.03 (2.26)
+DP - MLP = 0.11 (0.04)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 70.1 (1.18)
+DP - kernel SVM = 0.0 (0.01)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 74.4 (2.15)
+DP - MLP = 0.06 (0.04)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 20.51 (0.79)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 99.87 (0.22)
+DP - kernel SVM = 0.12 (0.08)
+Acc - linear SVM = 71.6 (2.83)
+DP - linear SVM = 0.02 (0.04)
+Acc - MLP = 96.13 (1.44)
+DP - MLP = 0.1 (0.05)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 28.83 (0.82)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 71.87 (2.62)
+DP - linear SVM = 0.03 (0.04)
+Acc - MLP = 97.0 (1.13)
+DP - MLP = 0.1 (0.07)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 98.73 (0.7)
+DP - kernel SVM = 0.1 (0.07)
+Acc - linear SVM = 76.8 (1.9)
+DP - linear SVM = 0.09 (0.07)
+Acc - MLP = 98.13 (0.69)
+DP - MLP = 0.12 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 36.63 (1.04)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 74.1 (2.23)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 95.83 (1.94)
+DP - MLP = 0.11 (0.08)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 33.21 (1.2)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.9 (0.21)
+DP - kernel SVM = 0.13 (0.07)
+Acc - linear SVM = 73.63 (2.21)
+DP - linear SVM = 0.05 (0.05)
+Acc - MLP = 95.67 (2.09)
+DP - MLP = 0.11 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 31.16 (1.07)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 73.3 (2.48)
+DP - linear SVM = 0.04 (0.04)
+Acc - MLP = 96.37 (1.49)
+DP - MLP = 0.11 (0.09)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 27.62 (0.76)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 71.1 (2.62)
+DP - linear SVM = 0.01 (0.01)
+Acc - MLP = 95.0 (2.29)
+DP - MLP = 0.11 (0.08)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 21.5 (0.98)
+MMD = 0.02 (0.0)
+Acc - kernel SVM = 99.87 (0.22)
+DP - kernel SVM = 0.13 (0.07)
+Acc - linear SVM = 71.9 (3.31)
+DP - linear SVM = 0.01 (0.01)
+Acc - MLP = 96.33 (1.28)
+DP - MLP = 0.12 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 9.87 (1.53)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 85.27 (4.45)
+DP - kernel SVM = 0.07 (0.04)
+Acc - linear SVM = 69.8 (1.21)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 78.5 (3.91)
+DP - MLP = 0.06 (0.04)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 35.72 (0.83)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.9 (0.15)
+DP - kernel SVM = 0.13 (0.07)
+Acc - linear SVM = 73.0 (2.03)
+DP - linear SVM = 0.05 (0.04)
+Acc - MLP = 96.0 (2.48)
+DP - MLP = 0.1 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 33.82 (1.25)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 71.8 (1.17)
+DP - linear SVM = 0.02 (0.03)
+Acc - MLP = 95.63 (2.58)
+DP - MLP = 0.11 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 31.0 (0.89)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.93 (0.13)
+DP - kernel SVM = 0.12 (0.07)
+Acc - linear SVM = 72.77 (2.13)
+DP - linear SVM = 0.03 (0.05)
+Acc - MLP = 96.0 (2.0)
+DP - MLP = 0.09 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 27.51 (0.97)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.9 (0.15)
+DP - kernel SVM = 0.13 (0.07)
+Acc - linear SVM = 71.9 (2.97)
+DP - linear SVM = 0.02 (0.03)
+Acc - MLP = 96.23 (1.93)
+DP - MLP = 0.11 (0.08)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 21.27 (0.85)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 99.83 (0.22)
+DP - kernel SVM = 0.12 (0.08)
+Acc - linear SVM = 71.53 (3.33)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 96.1 (1.69)
+DP - MLP = 0.11 (0.07)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 9.57 (0.7)
+MMD = 0.1 (0.1)
+Acc - kernel SVM = 86.47 (2.99)
+DP - kernel SVM = 0.12 (0.06)
+Acc - linear SVM = 70.73 (3.11)
+DP - linear SVM = 0.02 (0.05)
+Acc - MLP = 75.23 (4.23)
+DP - MLP = 0.08 (0.06)
+*******************************************************************************
+
+
+
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+Dataset = Adult
+-----------------------------------------------------------------------------------
+Embedding dim = 2
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 7.78 (0.77)
+MMD = 0.35 (0.03)
+Acc - kernel SVM = 82.03 (1.09)
+DP - kernel SVM = 0.2 (0.05)
+Acc - linear SVM = 79.87 (1.11)
+DP - linear SVM = 0.2 (0.04)
+Acc - MLP = 81.21 (1.22)
+DP - MLP = 0.22 (0.03)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 4.05 (0.93)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 77.44 (2.81)
+DP - kernel SVM = 0.04 (0.03)
+Acc - linear SVM = 75.54 (1.98)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 76.19 (2.44)
+DP - MLP = 0.02 (0.03)
+*******************************************************************************
+Method = FPCA-0
+Variance = 3.65 (0.92)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 77.05 (3.02)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 75.51 (1.93)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 76.24 (2.81)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = MBFPCA-3
+Variance = 6.03 (0.58)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 79.5 (1.15)
+DP - kernel SVM = 0.03 (0.02)
+Acc - linear SVM = 76.88 (1.95)
+DP - linear SVM = 0.01 (0.01)
+Acc - MLP = 78.29 (1.6)
+DP - MLP = 0.02 (0.01)
+*******************************************************************************
+Method = MBFPCA-6
+Variance = 5.83 (0.54)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 79.12 (1.08)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 76.72 (1.89)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 78.01 (1.29)
+DP - MLP = 0.02 (0.01)
+*******************************************************************************
+Method = INLP
+Variance = 2.06 (0.27)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 75.61 (1.41)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.33 (1.39)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = RLACE
+Variance = 2.02 (0.21)
+MMD = 0.01 (0.01)
+Acc - kernel SVM = 75.88 (1.51)
+DP - kernel SVM = 0.01 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.54 (1.42)
+DP - MLP = 0.01 (0.02)
+*******************************************************************************
+Method = Fair PCA
+Variance = 6.37 (0.65)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 80.25 (1.59)
+DP - kernel SVM = 0.06 (0.02)
+Acc - linear SVM = 77.26 (1.79)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 78.63 (1.36)
+DP - MLP = 0.04 (0.02)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 75.11 (1.66)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 77.17 (1.82)
+DP - MLP = 0.03 (0.02)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 3.05 (0.3)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 75.85 (1.59)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.26 (1.63)
+DP - MLP = 0.01 (0.01)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 4.27 (0.34)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 76.07 (1.34)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 74.99 (1.79)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 81.59 (1.12)
+DP - kernel SVM = 0.14 (0.03)
+Acc - linear SVM = 80.8 (1.09)
+DP - linear SVM = 0.13 (0.04)
+Acc - MLP = 82.02 (1.03)
+DP - MLP = 0.18 (0.04)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 6.37 (0.65)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 80.24 (1.57)
+DP - kernel SVM = 0.06 (0.02)
+Acc - linear SVM = 77.26 (1.79)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 78.65 (1.47)
+DP - MLP = 0.05 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 6.09 (0.59)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 79.22 (1.56)
+DP - kernel SVM = 0.07 (0.02)
+Acc - linear SVM = 76.2 (1.96)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 77.73 (1.16)
+DP - MLP = 0.05 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 5.71 (0.63)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 78.59 (1.67)
+DP - kernel SVM = 0.03 (0.03)
+Acc - linear SVM = 75.68 (2.1)
+DP - linear SVM = 0.0 (0.01)
+Acc - MLP = 77.36 (1.89)
+DP - MLP = 0.02 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 5.24 (0.5)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 78.09 (1.28)
+DP - kernel SVM = 0.02 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 77.14 (1.46)
+DP - MLP = 0.02 (0.01)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 3.94 (0.43)
+MMD = 0.02 (0.01)
+Acc - kernel SVM = 76.27 (1.46)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.41 (1.41)
+DP - MLP = 0.0 (0.01)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 3.02 (0.31)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 75.6 (1.49)
+DP - kernel SVM = 0.0 (0.0)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.21 (1.76)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 6.29 (0.63)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 79.99 (1.44)
+DP - kernel SVM = 0.04 (0.03)
+Acc - linear SVM = 76.85 (1.88)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 78.23 (1.73)
+DP - MLP = 0.04 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 5.89 (0.61)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 78.9 (1.2)
+DP - kernel SVM = 0.05 (0.03)
+Acc - linear SVM = 75.74 (1.59)
+DP - linear SVM = 0.01 (0.02)
+Acc - MLP = 77.54 (1.43)
+DP - MLP = 0.05 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 5.71 (0.56)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 78.34 (1.02)
+DP - kernel SVM = 0.04 (0.03)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 77.11 (1.26)
+DP - MLP = 0.03 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 5.18 (0.37)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 78.11 (1.86)
+DP - kernel SVM = 0.03 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 77.32 (1.55)
+DP - MLP = 0.03 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 3.5 (0.43)
+MMD = 0.03 (0.01)
+Acc - kernel SVM = 75.82 (1.5)
+DP - kernel SVM = 0.01 (0.01)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.15 (1.58)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 2.8 (0.35)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 75.51 (1.54)
+DP - kernel SVM = 0.0 (0.01)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 75.1 (1.64)
+DP - MLP = 0.0 (0.0)
+*******************************************************************************
+-----------------------------------------------------------------------------------
+Embedding dim = 10
+-----------------------------------------------------------------------------------
+Method = PCA
+Variance = 21.77 (1.95)
+MMD = 0.2 (0.01)
+Acc - kernel SVM = 93.64 (0.87)
+DP - kernel SVM = 0.16 (0.01)
+Acc - linear SVM = 82.7 (0.94)
+DP - linear SVM = 0.18 (0.02)
+Acc - MLP = 89.06 (2.07)
+DP - MLP = 0.2 (0.03)
+*******************************************************************************
+Method = FPCA-0.1
+Variance = 15.75 (1.14)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 91.94 (0.84)
+DP - kernel SVM = 0.13 (0.02)
+Acc - linear SVM = 78.1 (2.15)
+DP - linear SVM = 0.03 (0.02)
+Acc - MLP = 87.17 (1.1)
+DP - MLP = 0.11 (0.04)
+*******************************************************************************
+Method = FPCA-0
+Variance = 15.52 (1.12)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 91.66 (0.92)
+DP - kernel SVM = 0.13 (0.02)
+Acc - linear SVM = 77.72 (2.06)
+DP - linear SVM = 0.03 (0.02)
+Acc - MLP = 85.38 (2.08)
+DP - MLP = 0.09 (0.03)
+*******************************************************************************
+Method = MBFPCA-3
+Data not available in the repository of Lee et al.
+***************************************************************************
+Method = MBFPCA-6
+Variance = 15.49 (6.11)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 86.36 (3.58)
+DP - kernel SVM = 0.07 (0.03)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 81.69 (2.89)
+DP - MLP = 0.04 (0.03)
+*******************************************************************************
+Method = INLP
+Variance = 10.7 (0.8)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 88.95 (1.23)
+DP - kernel SVM = 0.1 (0.03)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 84.61 (1.39)
+DP - MLP = 0.1 (0.04)
+*******************************************************************************
+Method = RLACE
+Variance = 10.03 (0.51)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 91.34 (0.77)
+DP - kernel SVM = 0.12 (0.03)
+Acc - linear SVM = 75.24 (1.7)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 87.2 (2.15)
+DP - MLP = 0.12 (0.02)
+*******************************************************************************
+Method = Fair PCA
+Variance = 19.62 (1.73)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 93.42 (0.8)
+DP - kernel SVM = 0.16 (0.01)
+Acc - linear SVM = 81.31 (1.23)
+DP - linear SVM = 0.04 (0.02)
+Acc - MLP = 88.57 (1.66)
+DP - MLP = 0.16 (0.02)
+*******************************************************************************
+Method = Fair Kernel PCA
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 79.9 (1.54)
+DP - kernel SVM = 0.04 (0.03)
+Acc - linear SVM = 78.34 (1.21)
+DP - linear SVM = 0.02 (0.02)
+Acc - MLP = 81.18 (2.07)
+DP - MLP = 0.06 (0.05)
+*******************************************************************************
+Method = Fair PCA-S (0.5)
+Variance = 12.75 (1.31)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 86.85 (1.79)
+DP - kernel SVM = 0.09 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 83.09 (2.17)
+DP - MLP = 0.08 (0.05)
+*******************************************************************************
+Method = Fair PCA-S (0.85)
+Variance = 15.79 (1.05)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 91.81 (1.05)
+DP - kernel SVM = 0.15 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 86.47 (2.23)
+DP - MLP = 0.14 (0.03)
+*******************************************************************************
+Method = PCA Samadi
+Variance = nan (nan)
+MMD = nan (nan)
+Acc - kernel SVM = 87.78 (0.87)
+DP - kernel SVM = 0.18 (0.02)
+Acc - linear SVM = 83.2 (1.09)
+DP - linear SVM = 0.13 (0.03)
+Acc - MLP = 91.34 (2.04)
+DP - MLP = 0.18 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): mean, null
+Variance = 19.62 (1.73)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 93.42 (0.8)
+DP - kernel SVM = 0.16 (0.01)
+Acc - linear SVM = 81.31 (1.23)
+DP - linear SVM = 0.04 (0.02)
+Acc - MLP = 88.6 (1.98)
+DP - MLP = 0.17 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 2
+Variance = 18.89 (1.48)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 93.05 (0.68)
+DP - kernel SVM = 0.15 (0.01)
+Acc - linear SVM = 80.54 (1.25)
+DP - linear SVM = 0.09 (0.03)
+Acc - MLP = 88.87 (2.08)
+DP - MLP = 0.15 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 5
+Variance = 18.33 (1.62)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 92.64 (0.61)
+DP - kernel SVM = 0.16 (0.01)
+Acc - linear SVM = 78.69 (3.35)
+DP - linear SVM = 0.06 (0.05)
+Acc - MLP = 88.01 (1.61)
+DP - MLP = 0.15 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 10
+Variance = 17.38 (1.23)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 92.21 (1.04)
+DP - kernel SVM = 0.15 (0.02)
+Acc - linear SVM = 75.55 (1.36)
+DP - linear SVM = 0.01 (0.01)
+Acc - MLP = 87.11 (1.58)
+DP - MLP = 0.14 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 25
+Variance = 14.69 (1.19)
+MMD = 0.02 (0.0)
+Acc - kernel SVM = 90.4 (1.26)
+DP - kernel SVM = 0.14 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 86.27 (1.49)
+DP - MLP = 0.13 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Offline): all, 50
+Variance = 12.75 (1.16)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 86.66 (1.87)
+DP - kernel SVM = 0.09 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 83.53 (1.87)
+DP - MLP = 0.08 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): mean, null
+Variance = 19.35 (1.44)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 93.59 (0.64)
+DP - kernel SVM = 0.15 (0.01)
+Acc - linear SVM = 81.46 (1.14)
+DP - linear SVM = 0.04 (0.02)
+Acc - MLP = 89.44 (1.74)
+DP - MLP = 0.16 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 2
+Variance = 18.86 (1.44)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 93.45 (0.54)
+DP - kernel SVM = 0.15 (0.01)
+Acc - linear SVM = 81.06 (1.47)
+DP - linear SVM = 0.06 (0.03)
+Acc - MLP = 88.19 (1.5)
+DP - MLP = 0.16 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 5
+Variance = 18.0 (1.29)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 92.52 (0.75)
+DP - kernel SVM = 0.16 (0.02)
+Acc - linear SVM = 79.66 (1.38)
+DP - linear SVM = 0.08 (0.04)
+Acc - MLP = 88.16 (1.24)
+DP - MLP = 0.15 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 10
+Variance = 17.12 (0.92)
+MMD = 0.01 (0.0)
+Acc - kernel SVM = 91.97 (1.04)
+DP - kernel SVM = 0.15 (0.02)
+Acc - linear SVM = 76.05 (2.35)
+DP - linear SVM = 0.02 (0.04)
+Acc - MLP = 87.72 (2.0)
+DP - MLP = 0.14 (0.02)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 25
+Variance = 14.3 (1.1)
+MMD = 0.02 (0.0)
+Acc - kernel SVM = 90.68 (1.16)
+DP - kernel SVM = 0.14 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 85.95 (1.27)
+DP - MLP = 0.13 (0.03)
+*******************************************************************************
+Method = Fair Streaming PCA (Iterative): all, 50
+Variance = 12.62 (1.3)
+MMD = 0.0 (0.0)
+Acc - kernel SVM = 86.73 (2.05)
+DP - kernel SVM = 0.09 (0.02)
+Acc - linear SVM = 75.11 (1.66)
+DP - linear SVM = 0.0 (0.0)
+Acc - MLP = 83.74 (1.65)
+DP - MLP = 0.07 (0.02)
+*******************************************************************************
+
+
+
