@@ -320,6 +320,7 @@ for embedding_dim=[2,10]
             % end
             %% Store MBFPCA results
             if ~(name_num==3 && embedding_dim==10)
+                disp('MBFPCA');
                 mmds_MBFPCA3(split, name_num) = mmd(X(Z==1,:)*V_MBFPCA3, X(Z==0,:)*V_MBFPCA3, sigma);
                 exp_vars_MBFPCA3(split, name_num) = 100 * trace(V_MBFPCA3'*A*V_MBFPCA3)/trace(A);
                 mmds_MBFPCA6(split, name_num) = mmd(X(Z==1,:)*V_MBFPCA6, X(Z==0,:)*V_MBFPCA6, sigma);
@@ -342,6 +343,7 @@ for embedding_dim=[2,10]
                 [acc, DP, ~, ~] = fairness_metric_linear(X*V_MBFPCA6, Y, Z);
                 accs_MBFPCA6_linear(split, name_num) = acc;
                 DPs_MBFPCA6_linear(split, name_num) = DP;
+                disp(mmds_MBFPCA6);
             end
             
             % %% Store FairPCA results

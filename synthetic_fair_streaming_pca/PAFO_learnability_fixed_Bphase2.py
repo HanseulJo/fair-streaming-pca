@@ -8,34 +8,23 @@ from tqdm.auto import tqdm
 import random
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-
+from copy import deepcopy
 
 def run_fairPCA(param):
-    i, block_size = param
-    d, k, m = 10, 2, 3
-    Problem =  StreamingFairBlockPCA(
-        data_dim=d,
-        probability=0.5,
-        rank=m,  # effective rank of Sigma_gap
-        eps=0.3,
-        mu_scale=1,
-        max_cov_eig0=3,
-        max_cov_eig1=1,
-        seed=2023
-    )
+    i, block_size, Problem, k, m = param    
     Problem.train(
         target_dim=k,
         rank=m,
         n_iter=25,
         n_iter_inner=25,
         batch_size_subspace=block_size,
-        batch_size_pca=1000,
+        batch_size_pca=block_size,
         constraint='all',
         subspace_optimization='npm',
         pca_optimization='npm',
         seed=i,
         verbose=True,
-        use_true_N=False,
+        use_true_N=True,
         use_opt_V=False
     )
     exp_var_eps = Problem.exp_var_gt/Problem.total_var - Problem.buffer.explained_variance_ratio[-1]
@@ -45,6 +34,18 @@ def run_fairPCA(param):
 
 
 if __name__ == '__main__':
+    d, k, m = 30, 3, 3
+    Problem = StreamingFairBlockPCA(
+        data_dim=d,
+        probability=0.5,
+        rank=m,  # effective rank of Sigma_gap
+        eps=0.3,
+        mu_scale=2,
+        max_cov_eig0=4,
+        max_cov_eig1=2,
+        seed=2023
+    )
+
     MAX_PROC = 8
     delta_inv = 10
     mul = 1
@@ -61,7 +62,7 @@ if __name__ == '__main__':
         print()
         
         with multiprocessing.Pool(MAX_PROC) as p:
-            result = p.map_async(run_fairPCA, [(i, block_size) for i in range(delta_inv*mul)])
+            result = p.map_async(run_fairPCA, [(i, block_size, deepcopy(Problem), k, m) for i in range(delta_inv*mul)])
             result = jnp.array(result.get())
 
         eps1_arr, eps2_arr = result.T

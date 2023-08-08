@@ -8,21 +8,10 @@ from tqdm.auto import tqdm
 import random
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-
+from copy import deepcopy
 
 def run_fairPCA(param):
-    i, block_size = param
-    d, k, m = 100, 2, 3
-    Problem =  StreamingFairBlockPCA(
-        data_dim=d,
-        probability=0.5,
-        rank=m,  # effective rank of Sigma_gap
-        eps=0.1,
-        mu_scale=1,
-        max_cov_eig0=3,
-        max_cov_eig1=1,
-        seed=2023
-    )
+    i, block_size, Problem, k, m = param    
     Problem.train(
         target_dim=k,
         rank=m,
@@ -45,11 +34,23 @@ def run_fairPCA(param):
 
 
 if __name__ == '__main__':
-    MAX_PROC = 8
+    d, k, m = 30, 3, 3
+    Problem = StreamingFairBlockPCA(
+        data_dim=d,
+        probability=0.5,
+        rank=m,  # effective rank of Sigma_gap
+        eps=0.3,
+        mu_scale=2,
+        max_cov_eig0=4,
+        max_cov_eig1=2,
+        seed=2023
+    )
+
+    MAX_PROC = 10
     delta_inv = 10
-    mul = 2
+    mul = 1
     # bs_exp_list = jnp.linspace(0.6, 4, 35+1)#[::-1]
-    bs_exp_list = jnp.linspace(2, 3, 5+1)#[::-1]
+    bs_exp_list = jnp.linspace(1, 4, 6+1)#[::-1]
     eps1_list = []
     eps2_list = []
     linear = LinearRegression()
@@ -62,7 +63,7 @@ if __name__ == '__main__':
         print()
         
         with multiprocessing.Pool(MAX_PROC) as p:
-            result = p.map_async(run_fairPCA, [(i, block_size) for i in range(delta_inv*mul)])
+            result = p.map_async(run_fairPCA, [(i, block_size, deepcopy(Problem), k, m) for i in range(delta_inv*mul)])
             result = jnp.array(result.get())
 
         eps1_arr, eps2_arr = result.T

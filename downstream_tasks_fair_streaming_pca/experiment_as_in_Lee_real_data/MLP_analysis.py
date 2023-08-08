@@ -13,10 +13,10 @@ from sklearn.neural_network import MLPClassifier
 embedding_dim_range = [2,10]
 methods_to_run = [
     # 'PCA',
-    'FPCA-0',
-    'FPCA-0.1',
+    # 'FPCA-0',
+    # 'FPCA-0.1',
     # 'MBFPCA-3',
-    # 'MBFPCA-6',
+    'MBFPCA-6',
     # 'Fair PCA',
     # 'Fair PCA-S (0.5)',
     # 'Fair PCA-S (0.85)',
@@ -40,9 +40,9 @@ methods_to_run = [
     # 'Fair Streaming PCA (Iterative): all, 50',
 ]
 dataset_names = [
-    # 'COMPAS',
+    'COMPAS',
     'German',
-    # 'Adult'
+    'Adult'
 ]
 
 def make_directory(dir_path):

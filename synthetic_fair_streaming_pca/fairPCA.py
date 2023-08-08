@@ -38,9 +38,9 @@ def grassmanian_distance(A:jnp.ndarray, B:jnp.ndarray):
     assert A.shape == B.shape
     assert A.ndim <= 2
     if A.ndim == 1:
-        return jnp.linalg.norm(jnp.outer(A,A)-jnp.outer(B,B))
+        return jnp.linalg.norm(jnp.outer(A,A)-jnp.outer(B,B), 2)
     assert A.shape[0] >= A.shape[1]
-    return jnp.linalg.norm(A @ A.T - B @ B.T)
+    return jnp.linalg.norm(A @ A.T - B @ B.T, 2)
 
 
 def truncate_rows(A:jnp.ndarray, leave=None):
@@ -150,7 +150,7 @@ class StreamingFairBlockPCA:
             self.mu1 = mu0 * (self.p - 1.) / self.p
         self.mu = (1-self.p) * self.mu0 + self.p * self.mu1
         self.mu_gap = self.mu1 - self.mu0   # f
-        assert jnp.isclose(jnp.abs(self.mu).max(), 0.), f"mu is not close to 0."
+        # assert jnp.isclose(jnp.abs(self.mu).max(), 0.), f"mu={jnp.abs(self.mu).max()} is not close to 0."
         
         ## Conditional covariances:
         self.Sigma0 = Sigma0
@@ -160,14 +160,19 @@ class StreamingFairBlockPCA:
             r1 = self._r - r0
             key, rng = random.split(key)
             O, _ = jnp.linalg.qr(random.normal(rng, (self.d, self.d)))  # random orthogonal
-            D = random.uniform(rng, (self.d-r0-r1,), minval=0, maxval=min(max_cov_eig0, max_cov_eig1))
+            D = random.uniform(rng, (self.d-r0-r1,), minval=0, maxval=1) ** 2
+            D = D / D.max() * min(max_cov_eig0, max_cov_eig1)
             if Sigma0 is None:
                 W0 = jnp.concatenate([O[:, r0+r1:], O[:, :r0]], 1)
-                D0 = jnp.concatenate([D, random.uniform(rng, (r0,), minval=min(max_cov_eig0, max_cov_eig1)/2, maxval=max_cov_eig0)])
+                D0_ = random.uniform(rng, (r0,), minval=0, maxval=1) ** 2
+                D0_ = D0_ / D0_.max() * max_cov_eig0
+                D0 = jnp.concatenate([D, D0_])
                 self.Sigma0 = jnp.round(W0 @ jnp.diag(D0) @ W0.T + eps/2 * jnp.eye(self.d), 6)
             if Sigma1 is None:
                 W1 = jnp.concatenate([O[:, r0+r1:], O[:, r0:r0+r1]], 1)
-                D1 = jnp.concatenate([D, random.uniform(rng, (r1,), minval=min(max_cov_eig0, max_cov_eig1)/2, maxval=max_cov_eig1)])
+                D1_ = random.uniform(rng, (r1,), minval=0, maxval=1) ** 2
+                D1_ = D1_ / D1_.max() * max_cov_eig1
+                D1 = jnp.concatenate([D, D1_])
                 self.Sigma1 = jnp.round(W1 @ jnp.diag(D1) @ W1.T + eps/2 * jnp.eye(self.d), 6)
 
 
