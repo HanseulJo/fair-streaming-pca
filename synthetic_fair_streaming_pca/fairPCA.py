@@ -547,7 +547,10 @@ class StreamingFairBlockPCA:
                 mean_local_group[s] /= batch_size
                 mean_global_group[s] *= b_global_group[s]
                 mean_global_group[s] += b_local_group[s] * mean_local_group[s]
-                mean_global_group[s] /= b_global_group[s] + b_local_group[s]
+                if b_global_group[s] + b_local_group[s] > 0:
+                    mean_global_group[s] /= b_global_group[s] + b_local_group[s]
+                else:
+                    assert mean_global_group[s].sum() == 0
             if constraint in ['covariance', 'all']:
                 cov_W_group[s] /= batch_size
             b_global_group[s] += b_local_group[s]
