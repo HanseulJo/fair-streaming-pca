@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     MAX_PROC = 10
     delta_inv = 10
-    mul = 2
+    mul = 10
     bs_exp_list = jnp.linspace(1, 4, 6+1)#[::-1]
     eps1_list = []
     eps2_list = []
