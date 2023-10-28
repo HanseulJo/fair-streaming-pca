@@ -1,5 +1,5 @@
-*.pdf
-*/*.pdf
+# *.pdf
+# */*.pdf
 .DS_Store
 __pycache__/
 celeba_fair_streaming_pca/datasets/

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from jax import random
 import jax.numpy as jnp
 import numpy as np
-from scipy.linalg import null_space
+# from scipy.linalg import null_space
 from typing import Iterable, Tuple
 from tqdm.auto import trange
 # from sklearn.covariance import shrunk_covariance, ledoit_wolf, oas
@@ -24,8 +24,6 @@ def sin(A:jnp.ndarray, B:jnp.ndarray):
 
 
 def sin_v2(A:jnp.ndarray, B:jnp.ndarray):
-    # assert jnp.isclose(jnp.linalg.norm(A, 2), 1)
-    # assert jnp.isclose(jnp.linalg.norm(B, 2), 1)
     sin_square = B - A @ A.T @ B
     return jnp.linalg.norm(sin_square, 2)
 
@@ -150,7 +148,6 @@ class StreamingFairBlockPCA:
             self.mu1 = mu0 * (self.p - 1.) / self.p
         self.mu = (1-self.p) * self.mu0 + self.p * self.mu1
         self.mu_gap = self.mu1 - self.mu0   # f
-        # assert jnp.isclose(jnp.abs(self.mu).max(), 0.), f"mu={jnp.abs(self.mu).max()} is not close to 0."
         
         ## Conditional covariances:
         self.Sigma0 = Sigma0
@@ -175,44 +172,6 @@ class StreamingFairBlockPCA:
                 D1 = jnp.concatenate([D, D1_])
                 self.Sigma1 = jnp.round(W1 @ jnp.diag(D1) @ W1.T + eps/2 * jnp.eye(self.d), 6)
 
-
-
-            ### 1. Orthogonal matrices W0 & W1 (sharing r same columns)
-            # dim_gap_ = self.d-(self._r)
-            # key, rng = random.split(key)
-            # A_ = random.normal(rng, (self.d, self._r))
-            # if Sigma0 is None:
-            #     key, rng = random.split(key)
-            #     A0 = random.normal(rng, (self.d, dim_gap_))
-            #     A0 = jnp.concatenate([A_, A0], 1)
-            #     W0, _ = jnp.linalg.qr(A0)   # orthogonal
-            # if Sigma1 is None:
-            #     key, rng = random.split(key)
-            #     A1 = random.normal(rng, (self.d, dim_gap_))
-            #     A1 = jnp.concatenate([A_, A1], 1)
-            #     W1, _ = jnp.linalg.qr(A1)   # orthogonal
-            
-            # ### 2. Eigenvalues D0 & D1 (sharing r same eigenvalues)
-            # dim_gap = self.d-self._r
-            # if Sigma0 is None:
-            #     key, rng = random.split(key)
-            #     D0 = max_cov_eig0 * jnp.ones(self._r)  # main
-            #     key, rng = random.split(key)
-            #     D0 = jnp.concatenate([D0, jnp.zeros(dim_gap)]) + random.uniform(rng, (self.d,), minval=0, maxval=0.1)
-            # if Sigma1 is None:
-            #     key, rng = random.split(key)
-            #     D1 = max_cov_eig1 * jnp.ones(self._r)  # main
-            #     key, rng = random.split(key)
-            #     D1 = jnp.concatenate([D1, jnp.zeros(dim_gap)]) + random.uniform(rng, (self.d,), minval=0, maxval=0.1)
-
-            # ### 3. Eigen-Composition to make Sigma0 & Sigma1;
-            # ###     rank(Sigma1 - Sigma0) <= d - r.
-            # if Sigma0 is None:
-            #     self.Sigma0 = W0 @ jnp.diag(D0) @ W0.T + eps * jnp.eye(self.d)
-            #     self.Sigma0 = jnp.round((self.Sigma0 + self.Sigma0.T)/2, 6)
-            # if Sigma1 is None:
-            #     self.Sigma1 = W1 @ jnp.diag(D1) @ W1.T + eps * jnp.eye(self.d)
-            #     self.Sigma1 = jnp.round((self.Sigma1 + self.Sigma1.T)/2, 6)
         self.Sigma = (1-self.p) * self.Sigma0 + self.p * self.Sigma1 + self.p*(1-self.p) * jnp.outer(self.mu_gap, self.mu_gap)
         self.Sigma = jnp.round((self.Sigma + self.Sigma.T)/2, 6)
         assert jnp.min(jnp.linalg.eigh(self.Sigma)[0]) >= 0, f"Invalid Sigma: non-PSD, {jnp.linalg.eigh(self.Sigma)[0]}"
@@ -445,14 +404,6 @@ class StreamingFairBlockPCA:
                 # self.N, _ = jnp.linalg.qr(jnp.concatenate([f.reshape(-1,1), W], 1))
                 f_tilde /= norm_f_tilde
                 self.N = jnp.concatenate([W, f_tilde], 1)
-
-        ## CHECKING CODE
-        # print(self.N.shape)
-        # print(self.eigvec_Q_hat[:,-self.r:].shape)
-        # print("mean gap: orthogonal?", jnp.linalg.norm((jnp.eye(self.d)-self.N@self.N.T) @ self.mu_gap))
-        # print("covariance gap? (N)", jnp.linalg.norm((jnp.eye(self.d)-self.N@self.N.T) @ self.eigvec_Q_hat[:,-self.r:]))
-        # print("covariance gap? (W)", jnp.linalg.norm(W.T @ self.eigvec_Q_hat[:,:self.d-self.r]))
-        # raise Exception
 
         lr0 = lr
         pbar = trange(1, n_iter+1, disable=not verbose)

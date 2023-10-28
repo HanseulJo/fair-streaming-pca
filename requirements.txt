@@ -1,8 +1,0 @@
-ipykernel
-jupyter
-matplotlib
-numpy
-scipy
-torch
-torchvision
-tqdm
