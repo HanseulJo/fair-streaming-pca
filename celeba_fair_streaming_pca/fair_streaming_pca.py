@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 from tqdm.auto import tqdm, trange
-from scipy.linalg import null_space
 from torch.utils.data import DataLoader, Subset
 
 # from kleindessner.src.fair_pca.fair_PCA import (
@@ -320,6 +319,7 @@ class FairStreamingPCA:
             target_pca_dim,
             constraint='all',
         ):
+        from scipy.linalg import null_space
 
         batch_size, self.num_channel, height, width = next(iter(loader))[0].size()
         self.d = height*width
