@@ -5,7 +5,7 @@ from torchvision.datasets import CelebA
 from torch.utils.data import DataLoader, Subset
 import torch.multiprocessing as mp
 import matplotlib.pyplot as plt
-from fair_streaming_pca_pytorch import FairStreamingPCA
+from celeba_fair_streaming_pca.fair_streaming_pca import FairStreamingPCA
 import warnings
 warnings.filterwarnings('ignore')
 

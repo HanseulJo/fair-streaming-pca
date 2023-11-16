@@ -10,3 +10,4 @@ celeba_fair_streaming_pca/datasets/
 celeba_fair_streaming_pca/Tensors/
 old/
 *.asv
+downstream_tasks_fair_streaming_pca/datasets/Adult/full.csv
