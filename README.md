@@ -8,7 +8,7 @@ This is an official repository containing codes for our [**Fair Streaming Princi
 
 1. Download CelebA dataset images (`img_align_celeba.zip`) from [this link](https://drive.google.com/file/d/0B7EVK8r0v71pZjFTYXZWM3FlRnM/view?usp=sharing&resourcekey=0-dYn9z10tMJOBAkviAcfdyQ)
 1. Download CelebA dataset annotations (`list_attr_celeba.txt`, ...) from [this link](https://drive.google.com/drive/folders/0B7EVK8r0v71pOC0wOVZlQnFfaGs?resourcekey=0-pEjrQoTrlbjZJO2UL8K_WQ)
-1. Put these to the directory `celeba_fair_streaming_pca/datasets/celeba/`. Unzip the zip file here.
+1. Put these into the directory `celeba_fair_streaming_pca/datasets/celeba/`. Unzip the zip file here.
 
 ### Running Codes
 
@@ -23,21 +23,23 @@ FairStreamingPCA_CelebA_rankAblation.ipynb
 
 ## UCI Dataset (`downstream_tasks_fair_streaming_pca/`)
 
-We mostly follow the instruction in [this repository](https://github.com/amazon-science/fair-pca).
+We mostly follow the instructions in [this repository](https://github.com/amazon-science/fair-pca).
 
 ## Synthetic Experiments (`synthetic_tasks_fair_streaming_pca/`)
 
 ## Citation
 
-If you'd like to use our code and publish a material, please cite our paper:
+If you'd like to use our code and publish material, please cite our paper:
 
 ```bibtex
 @inproceedings{
     lee2023fair,
-    title={{Fair Streaming Principal Component Analysis: Statistical and Algorithmic Viewpoint}},
+    title={Fair Streaming Principal Component Analysis: Statistical and Algorithmic Viewpoint},
     author={Junghyun Lee and Hanseul Cho and Se-Young Yun and Chulhee Yun},
-    booktitle={Thirty-seventh Conference on Neural Information Processing Systems},
+    booktitle={Advances in Neural Information Processing Systems},
     year={2023},
+    volume={36},
+    pages={5126--5167},
     url={https://openreview.net/forum?id=TW3ipYdDQG}
 }
 ```
